@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ابزار شیشه‌ی مه‌آلود — لیانا</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Vazirmatn', Tahoma, sans-serif;
+    background: oklch(96% 0.01 75);
+    color: oklch(23% 0.02 45);
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+  }
+  h1 { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+  .sub { font-size: 13px; color: oklch(46% 0.018 45); line-height: 1.8; max-width: 680px; margin-bottom: 24px; }
+  .wrap { display: flex; flex-wrap: wrap; gap: 28px; max-width: 1100px; margin: 0 auto; }
+  .col { flex: 1 1 380px; min-width: 300px; }
+  .card {
+    background: oklch(99% 0.006 75); border: 1px solid oklch(23% 0.02 45 / 0.12);
+    border-radius: 16px; padding: 18px; margin-bottom: 18px;
+  }
+  .card h2 { font-size: 13px; font-weight: 800; margin-bottom: 12px; }
+  input[type="file"] {
+    display: block; width: 100%; font-size: 12.5px; padding: 10px; border-radius: 10px;
+    border: 1px dashed oklch(23% 0.02 45 / 0.3); background: oklch(97% 0.012 75);
+  }
+  .stage {
+    position: relative; width: 100%; max-width: 420px; margin: 16px auto 0;
+    background: oklch(90% 0.01 75); border-radius: 14px; overflow: hidden;
+    display: none; user-select: none;
+  }
+  .stage.active { display: block; }
+  .stage canvas { display: block; width: 100%; height: auto; }
+  .win {
+    position: absolute; border: 2px solid oklch(40% 0.06 182.5); cursor: move;
+  }
+  .win::after {
+    content: ''; position: absolute; inset: -2px;
+    box-shadow: inset 0 0 0 1px oklch(100% 0 0 / 0.7);
+    pointer-events: none;
+  }
+  .win .handle {
+    position: absolute; width: 14px; height: 14px; background: oklch(40% 0.06 182.5);
+    border: 2px solid oklch(99% 0.006 75); border-radius: 50%; cursor: nwse-resize;
+    bottom: -7px; left: -7px; pointer-events: auto;
+  }
+  .hint { font-size: 11.5px; color: oklch(46% 0.018 45); margin-top: 10px; line-height: 1.8; }
+  label.field-label { font-size: 11px; color: oklch(46% 0.018 45); display: block; margin-bottom: 4px; }
+  .sliders { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+  .sliders .row { display: flex; align-items: center; gap: 10px; }
+  .sliders .row span:first-child { font-size: 11px; color: oklch(46% 0.018 45); width: 76px; flex-shrink: 0; }
+  .sliders input[type="range"] { flex: 1; }
+  .sliders .row .val { font-size: 11px; width: 34px; text-align: left; direction: ltr; color: oklch(46% 0.018 45); }
+  button {
+    font-family: inherit; border: none; cursor: pointer; border-radius: 999px;
+    padding: 11px 20px; font-size: 12.5px; font-weight: 700; margin-top: 12px;
+    background: oklch(40% 0.06 182.5); color: oklch(98% 0.008 75);
+  }
+  button:hover { background: oklch(33% 0.062 182.5); }
+  button.ghost { background: oklch(93.5% 0.018 72); color: oklch(23% 0.02 45); margin-inline-start: 8px; }
+  a.download-link { display: inline-block; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<h1>ابزار شیشه‌ی مه‌آلود (Reveal Glass)</h1>
+<p class="sub">
+  یه عکس آپلود کن، مستطیل سبزآبی رو رو ناحیه‌ای که می‌خوای واضح بمونه (مثلاً لب‌ها) بکش/بزرگ‌کوچیک کن —
+  بقیه‌ی عکس با بافتِ شیشه‌ی مات (بلور + شیارِ عمودی + دون‌دونگی) محو می‌شه، دقیقاً همون افکتی که رو سایت لیانا داریم.
+  این‌بار خروجی یه <b>عکسِ نهاییِ آماده</b>ست — دیگه کد/مختصات لازم نیست؛ همین فایل رو دانلود کن و مستقیم بفرست.
+  چون افکت از قبل تو خودِ عکس پخته می‌شه، رو سایت هیچ فیلترِ زنده‌ای اجرا نمی‌شه (امن برای سافاری).
+</p>
+
+<div class="wrap">
+  <div class="col">
+    <div class="card">
+      <h2>۱) عکس رو آپلود کن</h2>
+      <input type="file" id="fileInput" accept="image/*">
+      <div class="stage" id="stage">
+        <canvas id="canvas"></canvas>
+        <div class="win" id="winEl">
+          <div class="handle" id="handleEl"></div>
+        </div>
+      </div>
+      <p class="hint" id="emptyHint">بعد از آپلود عکس، رو خودِ عکس کلیک کن و بکش تا مستطیل جابه‌جا بشه؛ نقطه‌ی سبزآبیِ گوشه‌ی پایین‌چپ رو بکش تا اندازه‌ش عوض بشه.</p>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="card">
+      <h2>۲) تنظیم بافتِ شیشه (اختیاری)</h2>
+      <div class="sliders">
+        <div class="row"><span>میزان بلور</span><input type="range" id="blurRange" min="4" max="30" value="16"><span class="val" id="blurVal">16</span></div>
+        <div class="row"><span>شدتِ بافتِ مات</span><input type="range" id="frostRange" min="0" max="15" value="7"><span class="val" id="frostVal">7</span></div>
+        <div class="row"><span>نرمیِ لبه</span><input type="range" id="featherRange" min="4" max="50" value="22"><span class="val" id="featherVal">22</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>۳) دانلود عکسِ نهایی</h2>
+      <p class="hint">وقتی مستطیل رو درست جای دلخواه گذاشتی، این دکمه رو بزن — فایل نهایی دانلود می‌شه، همونو بفرست.</p>
+      <button id="downloadBtn">دانلودِ عکسِ نهایی</button>
+      <button class="ghost" id="resetBtn">ریست مستطیل</button>
+    </div>
+    <div class="card">
+      <h2>راهنمای سریع</h2>
+      <p class="hint">
+        این ابزار مستقل از پروژه‌ست — برای هر عکس جدیدی (خدمات دیگه، هر جای دیگه‌ی سایت) که بخوای همین افکت رو داشته باشه، دوباره ازش استفاده کن.
+        عکسِ دانلودشده رو مستقیم به‌عنوانِ فایلِ نهایی (بدونِ هیچ پردازشِ دیگه‌ای) تو سایت استفاده می‌کنیم.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const fileInput = document.getElementById('fileInput');
+  const stage = document.getElementById('stage');
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const winEl = document.getElementById('winEl');
+  const handleEl = document.getElementById('handleEl');
+  const emptyHint = document.getElementById('emptyHint');
+  const blurRange = document.getElementById('blurRange');
+  const frostRange = document.getElementById('frostRange');
+  const featherRange = document.getElementById('featherRange');
+  const blurVal = document.getElementById('blurVal');
+  const frostVal = document.getElementById('frostVal');
+  const featherVal = document.getElementById('featherVal');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const resetBtn = document.getElementById('resetBtn');
+
+  let img = null;
+  let win = { cx: 50, cy: 55, w: 46, h: 30 }; // percentages relative to image
+
+  /* بافتِ شیشه‌ی مات واقعی (مثل شیشه‌ی سندبلاست‌شده) یه بافتِ نامنظم و بی‌جهته —
+     نه شیارهای عمودیِ منظم. این تابع یه لایه‌ی نویزِ تصادفیِ درشت می‌سازه و بلورش می‌کنه
+     تا بجای خط‌های مستقیم، یه بافتِ دون‌دون و ابری (frosted) به‌دست بیاد. مستقیم به
+     اندازه‌ی خودِ عکس ساخته می‌شه (نه یه تایلِ کوچیک تکرارشونده) که درزِ لبه‌ی تایل هم نداشته باشیم. */
+  function buildFrostLayer(w, h, strength) {
+    const cvs = document.createElement('canvas');
+    cvs.width = w; cvs.height = h;
+    const fctx = cvs.getContext('2d');
+    const imgData = fctx.createImageData(w, h);
+    const amp = strength * 13;
+    for (let i = 0; i < imgData.data.length; i += 4) {
+      const v = 128 + (Math.random() - 0.5) * 2 * amp;
+      imgData.data[i] = v; imgData.data[i + 1] = v; imgData.data[i + 2] = v; imgData.data[i + 3] = 255;
+    }
+    fctx.putImageData(imgData, 0, 0);
+    blurCanvas(cvs, 1.8, 2); // شعاعِ کوچیک‌تر تا دون‌ها ریزتر و واضح‌تر بمونن، نه محو
+    return cvs;
+  }
+
+  /* بلورِ دستی (باکس‌بلورِ چندپاسه) رو پیکسل‌های خودِ کانواس — به‌جای ctx.filter، چون
+     پشتیبانیِ ctx.filter رو سافاری ناقص/دیرهنگامه و بی‌صدا هیچ کاری نمی‌کنه.
+     این پیاده‌سازی مستقیم رو ImageData کار می‌کنه، پس رو همه‌ی مرورگرها (ازجمله سافاری) کار می‌کنه. */
+  function boxBlurPass(data, w, h, radius) {
+    if (radius < 1) return;
+    const tmp = new Float32Array(data.length);
+    // افقی
+    for (let y = 0; y < h; y++) {
+      const rowStart = y * w * 4;
+      let sr = 0, sg = 0, sb = 0, sa = 0;
+      for (let x = -radius; x <= radius; x++) {
+        const xx = Math.min(w - 1, Math.max(0, x));
+        const idx = rowStart + xx * 4;
+        sr += data[idx]; sg += data[idx + 1]; sb += data[idx + 2]; sa += data[idx + 3];
+      }
+      const norm = 1 / (radius * 2 + 1);
+      for (let x = 0; x < w; x++) {
+        const idx = rowStart + x * 4;
+        tmp[idx] = sr * norm; tmp[idx + 1] = sg * norm; tmp[idx + 2] = sb * norm; tmp[idx + 3] = sa * norm;
+        const xOut = Math.min(w - 1, Math.max(0, x - radius));
+        const xIn = Math.min(w - 1, Math.max(0, x + radius + 1));
+        const idxOut = rowStart + xOut * 4, idxIn = rowStart + xIn * 4;
+        sr += data[idxIn] - data[idxOut];
+        sg += data[idxIn + 1] - data[idxOut + 1];
+        sb += data[idxIn + 2] - data[idxOut + 2];
+        sa += data[idxIn + 3] - data[idxOut + 3];
+      }
+    }
+    // عمودی
+    for (let x = 0; x < w; x++) {
+      let sr = 0, sg = 0, sb = 0, sa = 0;
+      for (let y = -radius; y <= radius; y++) {
+        const yy = Math.min(h - 1, Math.max(0, y));
+        const idx = (yy * w + x) * 4;
+        sr += tmp[idx]; sg += tmp[idx + 1]; sb += tmp[idx + 2]; sa += tmp[idx + 3];
+      }
+      const norm = 1 / (radius * 2 + 1);
+      for (let y = 0; y < h; y++) {
+        const idx = (y * w + x) * 4;
+        data[idx] = sr * norm; data[idx + 1] = sg * norm; data[idx + 2] = sb * norm; data[idx + 3] = sa * norm;
+        const yOut = Math.min(h - 1, Math.max(0, y - radius));
+        const yIn = Math.min(h - 1, Math.max(0, y + radius + 1));
+        const idxOut = (yOut * w + x) * 4, idxIn = (yIn * w + x) * 4;
+        sr += tmp[idxIn] - tmp[idxOut];
+        sg += tmp[idxIn + 1] - tmp[idxOut + 1];
+        sb += tmp[idxIn + 2] - tmp[idxOut + 2];
+        sa += tmp[idxIn + 3] - tmp[idxOut + 3];
+      }
+    }
+  }
+
+  function blurCanvas(cvs, radius, passes) {
+    passes = passes || 3;
+    const bctx = cvs.getContext('2d');
+    const imgData = bctx.getImageData(0, 0, cvs.width, cvs.height);
+    // سه پاس باکس‌بلورِ کوچیک‌تر تقریباً معادلِ یه بلورِ گاوسیِ نرم‌تره
+    const passRadius = Math.max(1, Math.round(radius / 1.8));
+    for (let i = 0; i < passes; i++) boxBlurPass(imgData.data, cvs.width, cvs.height, passRadius);
+    bctx.putImageData(imgData, 0, 0);
+  }
+
+  function buildNoiseTile(size) {
+    const tile = document.createElement('canvas');
+    tile.width = size; tile.height = size;
+    const tctx = tile.getContext('2d');
+    const imgData = tctx.createImageData(size, size);
+    for (let i = 0; i < imgData.data.length; i += 4) {
+      const v = 128 + (Math.random() - 0.5) * 26;
+      imgData.data[i] = v; imgData.data[i + 1] = v; imgData.data[i + 2] = v; imgData.data[i + 3] = 255;
+    }
+    tctx.putImageData(imgData, 0, 0);
+    return tile;
+  }
+
+  function render() {
+    if (!img) return;
+    const w = canvas.width, h = canvas.height;
+
+    // 1) blurred base
+    const blurred = document.createElement('canvas');
+    blurred.width = w; blurred.height = h;
+    const bctx = blurred.getContext('2d');
+    bctx.drawImage(img, 0, 0, w, h);
+    blurCanvas(blurred, parseFloat(blurRange.value));
+
+    // 2) frosted glass texture (بی‌جهت، مثل شیشه‌ی سندبلاست‌شده)
+    const frostStrength = parseFloat(frostRange.value);
+    if (frostStrength > 0) {
+      const frost = buildFrostLayer(w, h, frostStrength);
+      bctx.save();
+      bctx.globalCompositeOperation = 'overlay';
+      bctx.globalAlpha = 0.6;
+      bctx.drawImage(frost, 0, 0);
+      bctx.restore();
+    }
+
+    // 3) fine grain noise
+    const noiseTile = buildNoiseTile(64);
+    const noisePattern = bctx.createPattern(noiseTile, 'repeat');
+    bctx.save();
+    bctx.globalCompositeOperation = 'overlay';
+    bctx.globalAlpha = 0.12;
+    bctx.fillStyle = noisePattern;
+    bctx.fillRect(0, 0, w, h);
+    bctx.restore();
+
+    // 4) sharp image masked to the reveal window (feathered rectangle)
+    const sharp = document.createElement('canvas');
+    sharp.width = w; sharp.height = h;
+    const sctx = sharp.getContext('2d');
+    sctx.drawImage(img, 0, 0, w, h);
+
+    const mask = document.createElement('canvas');
+    mask.width = w; mask.height = h;
+    const mctx = mask.getContext('2d');
+    const winW = (win.w / 100) * w, winH = (win.h / 100) * h;
+    const cx = (win.cx / 100) * w, cy = (win.cy / 100) * h;
+    mctx.fillStyle = '#fff';
+    mctx.fillRect(cx - winW / 2, cy - winH / 2, winW, winH);
+    blurCanvas(mask, parseFloat(featherRange.value));
+
+    sctx.globalCompositeOperation = 'destination-in';
+    sctx.drawImage(mask, 0, 0);
+
+    // final composite
+    ctx.clearRect(0, 0, w, h);
+    ctx.drawImage(blurred, 0, 0);
+    ctx.drawImage(sharp, 0, 0);
+  }
+
+  function layoutWinHandle() {
+    const rect = stage.getBoundingClientRect();
+    const wPx = (win.w / 100) * rect.width;
+    const hPx = (win.h / 100) * rect.height;
+    const cxPx = (win.cx / 100) * rect.width;
+    const cyPx = (win.cy / 100) * rect.height;
+    winEl.style.width = wPx + 'px';
+    winEl.style.height = hPx + 'px';
+    winEl.style.left = (cxPx - wPx / 2) + 'px';
+    winEl.style.top = (cyPx - hPx / 2) + 'px';
+  }
+
+  function update() {
+    render();
+    layoutWinHandle();
+  }
+
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const image = new Image();
+    image.onload = () => {
+      img = image;
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
+      stage.classList.add('active');
+      emptyHint.style.display = 'none';
+      win = { cx: 50, cy: 55, w: 46, h: 30 };
+      update();
+    };
+    image.src = url;
+  });
+
+  [blurRange, frostRange, featherRange].forEach((el) => {
+    el.addEventListener('input', () => {
+      blurVal.textContent = blurRange.value;
+      frostVal.textContent = frostRange.value;
+      featherVal.textContent = featherRange.value;
+      update();
+    });
+  });
+
+  resetBtn.addEventListener('click', () => {
+    win = { cx: 50, cy: 55, w: 46, h: 30 };
+    update();
+  });
+
+  downloadBtn.addEventListener('click', () => {
+    if (!img) return;
+    canvas.toBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'reveal-glass.jpg';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+    }, 'image/jpeg', 0.9);
+  });
+
+  // درگ برای جابه‌جایی/ریسایزِ مستطیل
+  let dragging = false, resizing = false, startX, startY, startWin;
+
+  winEl.addEventListener('pointerdown', (e) => {
+    if (e.target === handleEl) return;
+    dragging = true;
+    startX = e.clientX; startY = e.clientY;
+    startWin = { ...win };
+    winEl.setPointerCapture(e.pointerId);
+  });
+
+  handleEl.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    resizing = true;
+    startX = e.clientX; startY = e.clientY;
+    startWin = { ...win };
+    handleEl.setPointerCapture(e.pointerId);
+  });
+
+  window.addEventListener('pointermove', (e) => {
+    if (!dragging && !resizing) return;
+    const rect = stage.getBoundingClientRect();
+    const dxPct = ((e.clientX - startX) / rect.width) * 100;
+    const dyPct = ((e.clientY - startY) / rect.height) * 100;
+    if (dragging) {
+      win.cx = Math.min(100, Math.max(0, startWin.cx + dxPct));
+      win.cy = Math.min(100, Math.max(0, startWin.cy + dyPct));
+    } else if (resizing) {
+      win.w = Math.min(100, Math.max(8, startWin.w - dxPct * 2));
+      win.h = Math.min(100, Math.max(8, startWin.h - dyPct * 2));
+    }
+    update();
+  });
+
+  window.addEventListener('pointerup', () => { dragging = false; resizing = false; });
+  window.addEventListener('resize', () => { if (stage.classList.contains('active')) layoutWinHandle(); });
+})();
+</script>
+
+</body>
+</html>
