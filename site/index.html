@@ -1,22 +1,440 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<!doctype html>
+<html dir="rtl" lang="fa">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لیانا — پیش‌نمایش</title>
-<style>
-  body { font-family: Tahoma, sans-serif; background:#f4efe6; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; }
-  .box { text-align:center; }
-  a { display:block; background:#2f6f6b; color:#fff; text-decoration:none; padding:14px 28px; border-radius:10px; margin:10px auto; width:220px; font-size:16px; }
-  a:hover { opacity:0.9; }
-  h1 { color:#333; }
-</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>لیانا | کلینیک تخصصی زیبایی</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="box">
-    <h1>پیش‌نمایش کلینیک لیانا</h1>
-    <a href="glass/">کاندید ۱ — گلس‌مورفیسم</a>
-    <a href="liquid/">کاندید ۲ — Liquid Glass</a>
+
+<header class="topbar" id="topbar">
+  <div class="topbar-inner">
+    <a href="#top" class="brand tap"><img src="assets/logo.png" alt=""><span>LIANA</span></a>
+    <div class="nav-capsule" id="navCapsule">
+      <nav class="nav-links">
+        <a href="#services" class="tap">خدمات</a>
+        <a href="#" class="tap" data-open="about">درباره‌ی ما</a>
+        <a href="#contact" class="tap">تماس</a>
+      </nav>
+      <span class="nav-sep"></span>
+      <div class="nav-tabs" id="navTabs">
+        <button class="tap" type="button" data-tab="inj">تزریقات</button>
+        <button class="tap" type="button" data-tab="skin">پوست</button>
+        <button class="tap" type="button" data-tab="massage">ماساژ</button>
+      </div>
+      <span class="nav-sep"></span>
+      <a href="sms:+989332650382" class="cta-pill tap">رزرو نوبت</a>
+    </div>
+    <button class="menu-btn tap" id="menuBtn" aria-label="باز کردن منو" aria-expanded="false" aria-controls="drawer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
   </div>
+</header>
+
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer-top">
+    <button class="drawer-close tap" id="drawerClose" aria-label="بستن منو">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <nav class="drawer-links">
+    <a href="#services" class="tap">خدمات</a>
+    <a href="#" class="tap" data-open="about">درباره‌ی ما</a>
+    <a href="#contact" class="tap">تماس</a>
+  </nav>
+  <a href="sms:+989332650382" class="drawer-cta tap">رزرو نوبت با پیامک</a>
+  <a href="https://instagram.com/liana._clinic" target="_blank" rel="noopener" class="drawer-insta tap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
+    Liana._clinic
+  </a>
+</aside>
+
+<section class="hero" id="heroSection">
+  <div class="hero-media">
+    <div class="hero-marquee">
+      <div class="hero-marquee-track">
+        <div class="tile"><img src="assets/hero-after.jpg" alt="نمونه‌ی واقعی — بعد از درمان" loading="eager"></div>
+        <div class="tile"><img src="assets/service-botox.jpg" alt="نمونه‌ی واقعی — بعد از درمان" loading="eager"></div>
+        <div class="tile"><img src="assets/hotspot-detail.jpg" alt="نمونه‌ی واقعی — بعد از درمان" loading="eager"></div>
+        <div class="tile"><img src="assets/result-detail.jpg" alt="نمونه‌ی واقعی — بعد از درمان" loading="eager"></div>
+        <div class="tile"><img src="assets/hero-after.jpg" alt="نمونه‌ی واقعی — بعد از درمان" loading="eager"></div>
+        <div class="tile"><img src="assets/service-botox.jpg" alt="نمونه‌ی واقعی — بعد از درمان" loading="eager"></div>
+        <div class="tile"><img src="assets/hotspot-detail.jpg" alt="نمونه‌ی واقعی — بعد از درمان" loading="eager"></div>
+        <div class="tile"><img src="assets/result-detail.jpg" alt="نمونه‌ی واقعی — بعد از درمان" loading="eager"></div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-scrim"></div>
+  <div class="hero-content">
+    <span class="eyebrow">کلینیک تخصصی زیبایی لیانا</span>
+    <a href="#services" class="btn-cta tap">مشاهده‌ی خدمات</a>
+  </div>
+</section>
+
+<section class="section reveal-onscroll tint" id="services">
+  <div class="section-inner">
+    <span class="eyebrow-label">خدمات لیانا</span>
+    <h2 class="section-title">همه‌ی خدمات لیانا</h2>
+    <p class="section-sub">با نمونه‌ی نتیجه در جایی که آماده باشه؛ خدمات بدون نمونه هم به‌مرور همین‌جا تکمیل می‌شن.</p>
+    <div class="svc-grid" id="svcGrid"></div>
+  </div>
+</section>
+
+<div class="modal-backdrop" id="aboutBackdrop"></div>
+<div class="modal" id="aboutModal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal-media modal-media-about">
+    <button class="modal-close tap" id="aboutClose" aria-label="بستن">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div class="about-mark"><img src="assets/logo.png" alt=""></div>
+  </div>
+  <div class="modal-body">
+    <span class="modal-chip ready">مؤسس و مدیر کلینیک</span>
+    <h3>دکتر فرناز گنجایی</h3>
+    <p class="about-modal-bio">کلینیک لیانا زیر مدیریت دکتر فرناز گنجایی فعالیته، با تمرکز بر خدمات زیبایی و پوست و نتیجه‌ای طبیعی و متناسب با ویژگی‌های هر مراجع — نه یه فرم ثابت برای همه. اطلاعات تکمیلی تیم درمانی به‌زودی اضافه می‌شه.</p>
+    <div class="about-stats">
+      <div class="about-stat">
+        <div class="k">تخصص</div>
+        <div class="v">پوست، زیبایی و لاغری موضعی</div>
+      </div>
+      <div class="about-stat">
+        <div class="k">سابقه‌ی فعالیت</div>
+        <div class="v pending">به‌زودی تکمیل می‌شه</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="catBackdrop"></div>
+<div class="modal" id="catModal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal-media" id="catModalMedia"></div>
+  <div class="modal-body">
+    <span class="modal-chip" id="catModalChip"></span>
+    <h3 id="catModalTitle"></h3>
+    <p id="catModalDesc"></p>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="svcBackdrop"></div>
+<div class="modal" id="svcModal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal-media" id="svcModalMedia"></div>
+  <div class="modal-body" id="svcModalBody"></div>
+</div>
+
+<footer class="site-footer reveal-onscroll" id="contact">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand-col">
+        <div class="footer-brand">
+          <div class="mark"><img src="assets/logo.png" alt=""></div>
+          <span class="name">لیانا</span>
+        </div>
+        <p class="footer-tagline">کلینیک تخصصی زیبایی — با دکتر فرناز گنجایی، بهترین نسخه‌ی خودت باش.</p>
+        <a href="sms:+989332650382" class="drawer-cta tap" style="margin-top:16px; display:inline-block;">رزرو نوبت با پیامک</a>
+      </div>
+
+      <div>
+        <div class="footer-col-title">دسترسی سریع</div>
+        <nav class="footer-links">
+          <a href="#services" class="tap">خدمات</a>
+          <a href="#" class="tap" data-open="about">درباره‌ی ما</a>
+        </nav>
+      </div>
+
+      <div>
+        <div class="footer-col-title">تماس و آدرس</div>
+        <div class="footer-contact">
+          <a href="https://nshn.ir/earbv2SHexusWS" target="_blank" rel="noopener" class="row tap">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-6.3 7-11.5A7 7 0 0 0 5 9.5C5 14.7 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.4"/></svg></span>
+            <span>بلوار میرداماد، خیابان حصاری، کوچه دوم، مجتمع راز، طبقه دوم، واحد ۱۱</span>
+          </a>
+          <a href="tel:+989332650382" class="row tap">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 3a2 2 0 0 1-.5 2.1L8 10a16 16 0 0 0 6 6l1.2-1.3a2 2 0 0 1 2.1-.5c1 .4 2 .6 3 .7a2 2 0 0 1 1.7 2Z"/></svg></span>
+            <span dir="ltr" style="text-align:right;">۰۹۳۳ ۲۶۵ ۰۳۸۲</span>
+          </a>
+          <div class="row">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+            <span>ساعات کاری: به‌زودی تکمیل می‌شه</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="footer-col-title">ما رو دنبال کنید</div>
+        <a href="https://instagram.com/liana._clinic" target="_blank" rel="noopener" class="footer-insta tap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
+          Liana._clinic
+        </a>
+      </div>
+    </div>
+
+    <div class="footer-bottom">© تمامی حقوق محفوظ است</div>
+  </div>
+</footer>
+
+<div class="sticky-cta-wrap">
+  <a href="sms:+989332650382" class="sticky-cta tap">رزرو نوبت</a>
+</div>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => { requestAnimationFrame(() => document.body.classList.add('loaded')); });
+
+  /* ---------- دراور موبایل ---------- */
+  const menuBtn = document.getElementById('menuBtn');
+  const drawer = document.getElementById('drawer');
+  const drawerBackdrop = document.getElementById('drawerBackdrop');
+  const drawerClose = document.getElementById('drawerClose');
+  function openDrawer() {
+    drawer.classList.add('open'); drawerBackdrop.classList.add('open');
+    drawer.setAttribute('aria-hidden', 'false'); menuBtn.setAttribute('aria-expanded', 'true');
+  }
+  function closeDrawer() {
+    drawer.classList.remove('open'); drawerBackdrop.classList.remove('open');
+    drawer.setAttribute('aria-hidden', 'true'); menuBtn.setAttribute('aria-expanded', 'false');
+  }
+  menuBtn.addEventListener('click', openDrawer);
+  drawerClose.addEventListener('click', closeDrawer);
+  drawerBackdrop.addEventListener('click', closeDrawer);
+  drawer.querySelectorAll('a:not([data-open])').forEach(a => a.addEventListener('click', closeDrawer));
+
+  /* ---------- پاپ‌آپ درباره‌ی لیانا ---------- */
+  const aboutModal = document.getElementById('aboutModal');
+  const aboutBackdrop = document.getElementById('aboutBackdrop');
+  const aboutClose = document.getElementById('aboutClose');
+  function openAboutModal() {
+    aboutModal.classList.add('open'); aboutBackdrop.classList.add('open');
+    aboutModal.setAttribute('aria-hidden', 'false');
+  }
+  function closeAboutModal() {
+    aboutModal.classList.remove('open'); aboutBackdrop.classList.remove('open');
+    aboutModal.setAttribute('aria-hidden', 'true');
+  }
+  document.querySelectorAll('[data-open="about"]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeDrawer();
+      openAboutModal();
+    });
+  });
+  aboutClose.addEventListener('click', closeAboutModal);
+  aboutBackdrop.addEventListener('click', closeAboutModal);
+
+  /* ---------- پاپ‌آپ دسته‌بندی‌ها (تزریقات/پوست/ماساژ) ---------- */
+  const catModal = document.getElementById('catModal');
+  const catBackdrop = document.getElementById('catBackdrop');
+  const catModalMedia = document.getElementById('catModalMedia');
+  const catModalChip = document.getElementById('catModalChip');
+  const catModalTitle = document.getElementById('catModalTitle');
+  const catModalDesc = document.getElementById('catModalDesc');
+
+  const CATEGORIES = {
+    inj: {
+      chip: 'به‌زودی', ready: false,
+      title: 'تزریقات — بوتاکس و فیلر',
+      desc: 'رفع خطوط لب و حجم‌دهی طبیعی، با تمرکز بر نتیجه‌ی طبیعی و متناسب با هر مراجع.',
+      img: null
+    },
+    skin: {
+      chip: 'به‌زودی', ready: false,
+      title: 'پوست، زیبایی و لیزر',
+      desc: 'نمونه‌های واقعی پوست و لیزر لیانا به‌زودی همین‌جا قرار می‌گیرن.',
+      img: null
+    },
+    massage: {
+      chip: 'به‌زودی', ready: false,
+      title: 'ماساژ تخصصی',
+      desc: 'نمونه‌های واقعی ماساژ تخصصی لیانا به‌زودی همین‌جا قرار می‌گیرن.',
+      img: null
+    }
+  };
+
+  const pendingIconSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7 10 4h4l2 3"/><circle cx="12" cy="13.5" r="3.3"/></svg>';
+
+  function openCatModal(key) {
+    const c = CATEGORIES[key];
+    const mediaInner = c.img
+      ? '<img src="' + c.img + '" alt="' + c.title + '">'
+      : '<div class="modal-media-pending">' + pendingIconSVG + '</div>';
+    catModalMedia.innerHTML =
+      '<button class="modal-close tap" id="catCloseInner" aria-label="بستن"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>' +
+      mediaInner;
+    document.getElementById('catCloseInner').addEventListener('click', closeCatModal);
+    catModalChip.textContent = c.chip;
+    catModalChip.className = 'modal-chip ' + (c.ready ? 'ready' : 'soon');
+    catModalTitle.textContent = c.title;
+    catModalDesc.textContent = c.desc;
+    catModal.classList.add('open'); catBackdrop.classList.add('open');
+    catModal.setAttribute('aria-hidden', 'false');
+  }
+  function closeCatModal() {
+    catModal.classList.remove('open'); catBackdrop.classList.remove('open');
+    catModal.setAttribute('aria-hidden', 'true');
+  }
+  document.querySelectorAll('.nav-tabs button').forEach(btn => {
+    btn.addEventListener('click', () => openCatModal(btn.dataset.tab));
+  });
+  catBackdrop.addEventListener('click', closeCatModal);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (svcModal.classList.contains('open')) closeSvcModal();
+    else if (catModal.classList.contains('open')) closeCatModal();
+    else if (aboutModal.classList.contains('open')) closeAboutModal();
+    else if (drawer.classList.contains('open')) closeDrawer();
+  });
+
+  /* ---------- خدمات: چیدمان فهرستی، دسته‌بندی‌شده با آیکن اختصاصی ---------- */
+  const SERVICES = [
+    { key: 'botox', cat: 'inj', title: 'بوتاکس و فیلر', desc: 'رفع خطوط و حجم‌دهی طبیعی به لب و صورت.', img: 'assets/hero-after.jpg', pair: null, ready: false, detail: [{ before: 'assets/hero-before.jpg', after: 'assets/hero-after.jpg' }] },
+    { key: 'rf-face', cat: 'skin', title: 'جوان‌سازی صورت با RF', desc: 'سفت و جوان‌تر کردن پوست صورت با امواج رادیویی.', img: null, pair: null, ready: false, detail: [] },
+    { key: 'rf-body', cat: 'skin', title: 'لاغری موضعی با RF', desc: 'کاهش چربی موضعی و فرم‌دهی به بدن.', img: null, pair: null, ready: false, detail: [] },
+    { key: 'meso', cat: 'skin', title: 'مزوتراپی', desc: 'تقویت و شادابی پوست با تزریق ویتامین و مواد مغذی.', img: null, pair: null, ready: false, detail: [] },
+    { key: 'massage', cat: 'massage', title: 'ماساژ تخصصی', desc: 'ریلکسیشن و بهبود گردش خون.', img: null, pair: null, ready: false, detail: [] }
+  ];
+
+  const SVC_GROUP_LABELS = { inj: 'تزریقات', skin: 'پوست و لیزر', massage: 'ماساژ' };
+  const SVC_GROUP_ORDER = ['inj', 'skin', 'massage'];
+
+  const SVC_ICONS = {
+    'botox': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3.5 12c2.5-3 5-4.2 8.5-4.2S17.5 9 20.5 12c-2.5 3-5 4.2-8.5 4.2S6 15 3.5 12Z"/><path d="M3.5 12h17"/></svg>',
+    'rf-face': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 12h.01"/><path d="M9.5 9.5a3.5 3.5 0 0 1 5 0M7 7a7 7 0 0 1 10 0M14.5 14.5a3.5 3.5 0 0 1-5 0M17 17a7 7 0 0 1-10 0"/></svg>',
+    'rf-body': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 12h.01"/><path d="M9.5 9.5a3.5 3.5 0 0 1 5 0M7 7a7 7 0 0 1 10 0M14.5 14.5a3.5 3.5 0 0 1-5 0M17 17a7 7 0 0 1-10 0"/></svg>',
+    'meso': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3s6 7 6 11a6 6 0 1 1-12 0c0-4 6-11 6-11Z"/><path d="M9.5 14h5M12 11.5v5"/></svg>',
+    'massage': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3c5 0 8 4 8 8-4 0-8-3-8-8Z"/><path d="M12 21c-5 0-8-4-8-8 4 0 8 3 8 8Z"/><path d="M12 3v18"/></svg>'
+  };
+
+  const svcGrid = document.getElementById('svcGrid');
+
+  function buildSvcCard(svc, extraClass) {
+    let mediaHTML;
+    if (svc.pair) {
+      mediaHTML = '<div class="svc-pair">' +
+        '<div class="half"><span class="ba-tag">قبل</span><img src="' + svc.pair.before + '" alt="نمونه‌ی قبل — ' + svc.title + '"></div>' +
+        '<div class="half"><span class="ba-tag">بعد</span><img src="' + svc.pair.after + '" alt="نمونه‌ی بعد — ' + svc.title + '"></div>' +
+      '</div>';
+    } else if (svc.img) {
+      mediaHTML = '<img class="svc-single-img" src="' + svc.img + '" alt="' + svc.title + '">';
+    } else {
+      mediaHTML = '<div class="svc-pending-media"><span class="svc-icon-badge">' + SVC_ICONS[svc.key] + '</span></div>';
+    }
+    return '<article class="svc-card' + (extraClass || '') + '" data-svc="' + svc.key + '" tabindex="0" role="button" aria-haspopup="dialog">' +
+      '<div class="svc-media">' + mediaHTML + '</div>' +
+      '<div class="svc-info">' +
+        '<div class="svc-title-row"><h3>' + svc.title + '</h3><span class="svc-chip ' + (svc.ready ? 'ready' : 'soon') + '">' + (svc.ready ? 'آماده‌ی رزرو' : 'به‌زودی') + '</span></div>' +
+        '<p>' + svc.desc + '</p>' +
+      '</div>' +
+    '</article>';
+  }
+
+  svcGrid.innerHTML = SVC_GROUP_ORDER.map(catKey => {
+    const items = SERVICES.filter(s => s.cat === catKey);
+    if (!items.length) return '';
+    const rowsClass = 'svc-group-rows' + (items.length === 1 ? ' solo' : '');
+    const cardsHtml = items.map((svc, i) => {
+      const isTrailingOdd = items.length > 1 && items.length % 2 === 1 && i === items.length - 1;
+      return buildSvcCard(svc, isTrailingOdd ? ' full' : '');
+    }).join('');
+    return '<div class="svc-group">' +
+      '<div class="svc-group-head"><span class="dot"></span><h4>' + SVC_GROUP_LABELS[catKey] + '</h4></div>' +
+      '<div class="' + rowsClass + '">' + cardsHtml + '</div>' +
+    '</div>';
+  }).join('');
+
+  /* ---------- پاپ‌آپ کامل هر خدمت (قبل/بعد + توضیحات + رزرو) ---------- */
+  const svcModal = document.getElementById('svcModal');
+  const svcBackdrop = document.getElementById('svcBackdrop');
+  const svcModalMedia = document.getElementById('svcModalMedia');
+  const svcModalBody = document.getElementById('svcModalBody');
+
+  const SVC_FACTS = [
+    { k: 'مدت جلسه', v: null },
+    { k: 'تعداد جلسات پیشنهادی', v: null },
+    { k: 'زمان نقاهت', v: null }
+  ];
+
+  function openSvcModal(key) {
+    const svc = SERVICES.find(s => s.key === key);
+    if (!svc) return;
+    const hasDetail = svc.detail && svc.detail.length > 0;
+    const closeBtnHTML = '<button class="modal-close tap" id="svcCloseInner" aria-label="بستن"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';
+
+    function pairSlideHTML(pair) {
+      return '<div class="svc-pair-slide"><div class="svc-pair">' +
+        '<div class="half"><span class="ba-tag">قبل</span><img src="' + pair.before + '" alt="نمونه‌ی قبل — ' + svc.title + '"></div>' +
+        '<div class="half"><span class="ba-tag">بعد</span><img src="' + pair.after + '" alt="نمونه‌ی بعد — ' + svc.title + '"></div>' +
+      '</div></div>';
+    }
+
+    let mediaInner;
+    if (hasDetail) {
+      const dotsHTML = svc.detail.length > 1
+        ? '<div class="svc-pair-dots" id="svcPairDots">' + svc.detail.map((_, i) => '<span class="dot' + (i === 0 ? ' active' : '') + '"></span>').join('') + '</div>'
+        : '';
+      mediaInner = closeBtnHTML +
+        '<div class="svc-pair-carousel" id="svcPairCarousel"><div class="svc-pair-track">' +
+          svc.detail.map(pairSlideHTML).join('') +
+        '</div></div>' + dotsHTML;
+    } else {
+      mediaInner = closeBtnHTML + '<div class="modal-media-pending"><span class="svc-icon-badge lg">' + SVC_ICONS[svc.key] + '</span></div>';
+    }
+    svcModalMedia.innerHTML = mediaInner;
+    document.getElementById('svcCloseInner').addEventListener('click', closeSvcModal);
+    if (hasDetail && svc.detail.length > 1) {
+      const carousel = document.getElementById('svcPairCarousel');
+      const dots = document.querySelectorAll('#svcPairDots .dot');
+      carousel.addEventListener('scroll', () => {
+        const idx = Math.round(carousel.scrollLeft / carousel.clientWidth);
+        dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+      });
+    }
+
+    const chipText = hasDetail ? 'نمونه‌ی واقعی مراجعین' : 'به‌زودی';
+    const chipClass = hasDetail ? 'ready' : 'soon';
+    const descText = hasDetail
+      ? svc.desc
+      : svc.desc + ' نمونه‌ی قبل و بعد این خدمت به‌زودی همین‌جا اضافه می‌شه.';
+    const factsHTML = '<div class="about-stats svc-facts">' + SVC_FACTS.map(f =>
+      '<div class="about-stat"><div class="k">' + f.k + '</div><div class="v ' + (f.v ? '' : 'pending') + '">' + (f.v || 'به‌زودی تکمیل می‌شه') + '</div></div>'
+    ).join('') + '</div>';
+
+    svcModalBody.innerHTML =
+      '<span class="modal-chip ' + chipClass + '">' + chipText + '</span>' +
+      '<h3>' + svc.title + '</h3>' +
+      '<p>' + descText + '</p>' +
+      factsHTML +
+      '<a href="sms:+989332650382" class="drawer-cta tap svc-reserve-cta">رزرو نوبت با پیامک</a>';
+    svcModal.classList.add('open'); svcBackdrop.classList.add('open');
+    svcModal.setAttribute('aria-hidden', 'false');
+  }
+  function closeSvcModal() {
+    svcModal.classList.remove('open'); svcBackdrop.classList.remove('open');
+    svcModal.setAttribute('aria-hidden', 'true');
+  }
+  svcGrid.addEventListener('click', (e) => {
+    const card = e.target.closest('.svc-card');
+    if (card && card.dataset.svc) openSvcModal(card.dataset.svc);
+  });
+  svcGrid.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const card = e.target.closest('.svc-card');
+    if (card && card.dataset.svc) { e.preventDefault(); openSvcModal(card.dataset.svc); }
+  });
+  svcBackdrop.addEventListener('click', closeSvcModal);
+
+  /* ---------- انیمیشن ورود موقع اسکرول ---------- */
+  const revealEls = document.querySelectorAll('.reveal-onscroll');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in-view'); io.unobserve(e.target); } });
+    }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+    revealEls.forEach(el => io.observe(el));
+  } else {
+    revealEls.forEach(el => el.classList.add('in-view'));
+  }
+</script>
 </body>
 </html>
