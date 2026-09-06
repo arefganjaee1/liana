@@ -161,6 +161,25 @@
   .ba-dots { position: absolute; z-index: 3; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; }
   .ba-dots .dot { width: 6px; height: 6px; border-radius: 999px; background: oklch(100% 0 0 / 0.5); transition: background .2s ease, width .2s ease; }
   .ba-dots .dot.active { width: 16px; background: oklch(100% 0 0 / 0.95); }
+
+  /* ============ نسخه‌ی دسکتاپ — همون کارت، رو یه زمینه‌ی برندشده به‌جای فضای خالی ============ */
+  @media (min-width: 700px) {
+    body {
+      background:
+        radial-gradient(1100px 760px at 14% -10%, oklch(76% 0.052 185.5 / 0.32), transparent 60%),
+        radial-gradient(900px 640px at 100% 100%, oklch(40% 0.06 182.5 / 0.22), transparent 55%),
+        var(--bg);
+      padding: 56px 24px;
+    }
+    .page {
+      max-width: 440px;
+      min-height: auto;
+      border-radius: 26px;
+      overflow: hidden;
+      box-shadow: 0 34px 90px oklch(30% 0.02 40 / 0.16), 0 6px 18px oklch(30% 0.02 40 / 0.08);
+    }
+    .hero { max-height: 380px; }
+  }
 </style>
 </head>
 <body>
@@ -248,30 +267,30 @@
       <div style="display:flex; flex-direction:column; gap:10px;">
         <div class="section-head"><span class="section-title">خدمات ما</span></div>
         <div class="services-grid">
-          <div class="service-card">
+          <a class="service-card tap" href="sms:+989332650382" data-service="بوتاکس و فیلر" aria-label="رزرو نوبت برای بوتاکس و فیلر">
             <div class="fill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4l-4 4M16.5 6.5l-9 9-2.5 4.5 4.5-2.5 9-9-2-2Z"/><path d="M13 8l3 3"/></svg></div>
             <span class="label">بوتاکس و فیلر</span>
-          </div>
-          <div class="service-card">
+          </a>
+          <a class="service-card tap" href="sms:+989332650382" data-service="جوان‌سازی RF" aria-label="رزرو نوبت برای جوان‌سازی RF">
             <div class="fill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M3 12h3M18 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/><circle cx="12" cy="12" r="3.4"/></svg></div>
             <span class="label">جوان‌سازی RF</span>
-          </div>
-          <div class="service-card">
+          </a>
+          <a class="service-card tap" href="sms:+989332650382" data-service="لاغری و کاهش وزن" aria-label="رزرو نوبت برای لاغری و کاهش وزن">
             <div class="fill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3 2.5 5 6 5 9.5A5 5 0 0 1 7 12.5C7 9 9 5.5 12 3Z"/><path d="M9.5 15.5c0 1.5 1.1 2.5 2.5 2.5"/></svg></div>
             <span class="label">لاغری و کاهش وزن</span>
-          </div>
-          <div class="service-card">
+          </a>
+          <a class="service-card tap" href="sms:+989332650382" data-service="مزوتراپی" aria-label="رزرو نوبت برای مزوتراپی">
             <div class="fill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2"/></svg></div>
             <span class="label">مزوتراپی</span>
-          </div>
-          <div class="service-card">
+          </a>
+          <a class="service-card tap" href="sms:+989332650382" data-service="درمانِ دورِ چشم" aria-label="رزرو نوبت برای درمانِ دورِ چشم">
             <div class="fill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.6"/></svg></div>
             <span class="label">درمانِ دورِ چشم</span>
-          </div>
-          <div class="service-card">
+          </a>
+          <a class="service-card tap" href="sms:+989332650382" data-service="ماساژ تخصصی" aria-label="رزرو نوبت برای ماساژ تخصصی">
             <div class="fill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8c1.5-2 3-3 6-3s4.5 1 6 3M5 12h14M6 16c1.5 2 3 3 6 3s4.5-1 6-3"/></svg></div>
             <span class="label">ماساژ تخصصی</span>
-          </div>
+          </a>
         </div>
       </div>
 
@@ -326,6 +345,11 @@
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
+
+    document.querySelectorAll('.service-card[data-service]').forEach((el) => {
+      const text = 'سلام، می‌خوام برای «' + el.dataset.service + '» نوبت بگیرم.';
+      el.href = 'sms:+989332650382?body=' + encodeURIComponent(text);
+    });
 
     const baTrack = document.getElementById('baTrack');
     const baDots = document.querySelectorAll('#baDots .dot');
