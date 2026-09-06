@@ -157,12 +157,19 @@
   .service-card .fill svg { width: 19px; height: 19px; color: var(--ink-3); }
   .service-card .label { font-size: 10.5px; font-weight: 600; color: var(--ink); text-align: center; padding: 7px 4px; }
 
-  .gallery-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 9px; }
-  .gallery-main, .gallery-side .tile { border-radius: 14px; overflow: hidden; background: var(--card); display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 2px oklch(30% 0.02 40 / 0.05); }
-  .gallery-main { aspect-ratio: 1; }
-  .gallery-main img, .gallery-side .tile img { width: 100%; height: 100%; object-fit: contain; display: block; }
-  .gallery-side { display: flex; flex-direction: column; gap: 9px; }
-  .gallery-side .tile { flex: 1; }
+  /* گالریِ قبل/بعد — هم‌سبک با سایتِ اصلی: جفت‌عکسِ قبل|بعد با برچسب، بدونِ بلورِ زنده */
+  .ba-carousel { position: relative; aspect-ratio: 16/10; border-radius: 16px; overflow: hidden; background: var(--card); box-shadow: 0 1px 2px oklch(30% 0.02 40 / 0.05); }
+  .ba-track { display: flex; direction: ltr; width: 100%; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .ba-track::-webkit-scrollbar { display: none; }
+  .ba-slide { position: relative; flex: 0 0 100%; scroll-snap-align: start; display: flex; direction: ltr; gap: 4px; }
+  .ba-slide .half { position: relative; flex: 1; overflow: hidden; }
+  .ba-slide .half img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; display: block; }
+  .ba-slide .ba-tag { position: absolute; z-index: 2; top: 10px; font-size: 10px; font-weight: 700; color: #fff; padding: 4px 10px; border-radius: 999px; background: oklch(15% 0.03 195 / 0.55); border: 1px solid oklch(100% 0 0 / 0.22); }
+  .ba-slide .half:first-child .ba-tag { left: 10px; }
+  .ba-slide .half:last-child .ba-tag { right: 10px; }
+  .ba-dots { position: absolute; z-index: 3; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; }
+  .ba-dots .dot { width: 6px; height: 6px; border-radius: 999px; background: oklch(100% 0 0 / 0.5); transition: background .2s ease, width .2s ease; }
+  .ba-dots .dot.active { width: 16px; background: oklch(100% 0 0 / 0.95); }
 </style>
 </head>
 <body>
@@ -281,12 +288,18 @@
         <div class="section-head">
           <span class="section-title">قبل و بعد</span>
         </div>
-        <div class="gallery-grid">
-          <div class="gallery-main"><img src="assets/before-after-main.jpg" alt="نمونه‌ی قبل و بعد"></div>
-          <div class="gallery-side">
-            <div class="tile"><img src="assets/before-after-1.jpg" alt="نمونه‌ی قبل و بعد"></div>
-            <div class="tile"><img src="assets/before-after-2.jpg" alt="نمونه‌ی قبل و بعد"></div>
+        <div class="ba-carousel">
+          <div class="ba-track" id="baTrack">
+            <div class="ba-slide">
+              <div class="half"><span class="ba-tag">قبل</span><img src="assets/hero-before.jpg" alt="نمونه‌ی قبل — فیلر لب"></div>
+              <div class="half"><span class="ba-tag">بعد</span><img src="assets/hero-after.jpg" alt="نمونه‌ی بعد — فیلر لب"></div>
+            </div>
+            <div class="ba-slide">
+              <div class="half"><span class="ba-tag">قبل</span><img src="assets/hero-before-2.jpg" alt="نمونه‌ی قبل — فیلر لب"></div>
+              <div class="half"><span class="ba-tag">بعد</span><img src="assets/hero-after-2.jpg" alt="نمونه‌ی بعد — فیلر لب"></div>
+            </div>
           </div>
+          <div class="ba-dots" id="baDots"><span class="dot active"></span><span class="dot"></span></div>
         </div>
 
       <a class="cta glass tap" href="sms:+989332650382" style="color:var(--accent-dark); font-weight:700; text-decoration:none; display:flex; align-items:center; justify-content:center;">رزرو نوبت با پیامک</a>
@@ -321,6 +334,15 @@
       a.download = 'liana-clinic.vcf';
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    const baTrack = document.getElementById('baTrack');
+    const baDots = document.querySelectorAll('#baDots .dot');
+    if (baTrack && baDots.length > 1) {
+      baTrack.addEventListener('scroll', () => {
+        const idx = Math.round(baTrack.scrollLeft / baTrack.clientWidth);
+        baDots.forEach((d, i) => d.classList.toggle('active', i === idx));
+      });
     }
   </script>
 
