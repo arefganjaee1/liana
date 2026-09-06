@@ -78,7 +78,7 @@ body.loaded { opacity: 1; }
 /* روی موبایل جای این نوار محدوده و تعداد تب‌ها ثابت نیست؛ به‌جای کوچیک‌کردن/بریدنِ متنِ تب‌ها،
    خودِ نوار اسکرولِ افقی می‌گیره تا هر برچسب کامل و خونا بمونه. */
 .nav-tabs {
-  display: flex; align-items: center; gap: 2px; flex: 1; min-width: 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 2px; flex: 1; min-width: 0;
   overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none;
 }
 .nav-tabs::-webkit-scrollbar { display: none; }
