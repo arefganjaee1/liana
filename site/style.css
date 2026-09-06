@@ -75,10 +75,16 @@ body.loaded { opacity: 1; }
 .nav-links a:hover { color: var(--accent); }
 .nav-sep { display: none; width: 1px; height: 18px; background: var(--line-2); flex-shrink: 0; }
 
-.nav-tabs { display: flex; align-items: center; gap: 2px; flex: 1; min-width: 0; }
+/* روی موبایل جای این نوار محدوده و تعداد تب‌ها ثابت نیست؛ به‌جای کوچیک‌کردن/بریدنِ متنِ تب‌ها،
+   خودِ نوار اسکرولِ افقی می‌گیره تا هر برچسب کامل و خونا بمونه. */
+.nav-tabs {
+  display: flex; align-items: center; gap: 2px; flex: 1; min-width: 0;
+  overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none;
+}
+.nav-tabs::-webkit-scrollbar { display: none; }
 .nav-tabs button {
-  flex: 1; min-width: 0; font-size: 10.5px; font-weight: 700; color: var(--ink-2);
-  padding: 7px 6px; border-radius: 999px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  flex: 0 0 auto; font-size: 10.5px; font-weight: 700; color: var(--ink-2);
+  padding: 7px 10px; border-radius: 999px; white-space: nowrap;
   transition: color .2s ease, background .2s ease;
 }
 .nav-tabs button:hover { color: var(--ink); background: oklch(23% 0.02 45 / 0.06); }
