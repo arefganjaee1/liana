@@ -304,7 +304,7 @@
 
   /* ---------- خدمات: چیدمان فهرستی، دسته‌بندی‌شده با آیکن اختصاصی ---------- */
   const SERVICES = [
-    { key: 'botox', cat: 'inj', title: 'بوتاکس و فیلر', desc: 'رفع خطوط و حجم‌دهی طبیعی به لب و صورت.', img: 'assets/hero-after.jpg', pair: null, ready: false, detail: [{ before: 'assets/hero-before.jpg', after: 'assets/hero-after.jpg' }, { before: 'assets/hero-before-2.jpg', after: 'assets/hero-after-2.jpg' }], variants: ['بوتاکسِ رگولار', 'بوتاکسِ دیسپورت (Dysport)', 'فیلرِ لب'] },
+    { key: 'botox', cat: 'inj', title: 'بوتاکس و فیلر', desc: 'رفع خطوط و حجم‌دهی طبیعی به لب و صورت.', img: 'assets/hero-after.jpg', pair: null, ready: false, detail: [{ before: 'assets/hero-before.jpg', beforePos: '50% 45%', after: 'assets/hero-after.jpg', afterPos: '50% 72%' }, { before: 'assets/hero-before-2.jpg', after: 'assets/hero-after-2.jpg' }], variants: ['بوتاکسِ رگولار', 'بوتاکسِ دیسپورت (Dysport)', 'فیلرِ لب'] },
     { key: 'eye-treat', cat: 'inj', title: 'فیلر و درمانِ دورِ چشم', desc: 'رفعِ گودیِ زیرِ چشم و جوان‌سازیِ ناحیه‌ی حساسِ دورِ چشم.', img: null, pair: null, ready: false, detail: [], variants: ['Jalupro Young Eye', 'فیلرِ ELOHA چشم'] },
     { key: 'rf-face', cat: 'skin', title: 'جوان‌سازی صورت با RF', desc: 'سفت و جوان‌تر کردن پوست صورت با امواج رادیویی.', img: null, pair: null, ready: false, detail: [] },
     { key: 'rf-body', cat: 'skin', title: 'لاغری و کاهشِ وزن', desc: 'کاهشِ چربیِ موضعی و فرم‌دهیِ بدن، یا کاهشِ وزن با تزریقِ دارویی زیرِ نظرِ پزشک.', img: null, pair: null, ready: false, detail: [], variants: ['دستگاهِ رادیوفرکانسیِ RF (لاغریِ موضعی)', 'تزریقِ مونجارو (زیرِ نظرِ پزشک)'] },
@@ -380,6 +380,48 @@
     { k: 'زمان نقاهت', v: null }
   ];
 
+  /* ---------- اسلایدرِ کشیدنیِ قبل/بعد: با کشیدنِ دستگیره، عکسِ «بعد» زیرِ عکسِ «قبل» آشکار می‌شه.
+     عمداً فقط خودِ دستگیره قابلِ‌کشیدنه (نه کلِ عکس)، تا با سوایپِ افقیِ کاروسلِ بینِ چند نمونه تداخل نکنه. */
+  function initBaSliders(scopeEl) {
+    scopeEl.querySelectorAll('.ba-slider').forEach((slider) => {
+      const before = slider.querySelector('.ba-before');
+      const handle = slider.querySelector('.ba-handle');
+      if (!before || !handle) return;
+
+      function setPct(pct) {
+        pct = Math.max(0, Math.min(100, pct));
+        before.style.clipPath = 'inset(0 0 0 ' + pct + '%)';
+        handle.style.left = pct + '%';
+        slider.setAttribute('aria-valuenow', String(Math.round(100 - pct)));
+      }
+      function pctFromClientX(clientX) {
+        const rect = slider.getBoundingClientRect();
+        return ((clientX - rect.left) / rect.width) * 100;
+      }
+      function onMove(e) {
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        setPct(pctFromClientX(clientX));
+      }
+      function stopDrag() {
+        document.removeEventListener('pointermove', onMove);
+        document.removeEventListener('pointerup', stopDrag);
+      }
+      function startDrag(e) {
+        e.preventDefault();
+        onMove(e);
+        document.addEventListener('pointermove', onMove);
+        document.addEventListener('pointerup', stopDrag);
+      }
+      handle.addEventListener('pointerdown', startDrag);
+      slider.addEventListener('keydown', (e) => {
+        const current = parseFloat(handle.style.left) || 50;
+        if (e.key === 'ArrowLeft') { setPct(current - 5); e.preventDefault(); }
+        else if (e.key === 'ArrowRight') { setPct(current + 5); e.preventDefault(); }
+      });
+      setPct(50);
+    });
+  }
+
   function openSvcModal(key) {
     const svc = SERVICES.find(s => s.key === key);
     if (!svc) return;
@@ -387,10 +429,15 @@
     const closeBtnHTML = '<button class="modal-close tap" id="svcCloseInner" aria-label="بستن"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';
 
     function pairSlideHTML(pair) {
-      return '<div class="svc-pair-slide"><div class="svc-pair">' +
-        '<div class="half"><span class="ba-tag">قبل</span><img src="' + pair.before + '" alt="نمونه‌ی قبل — ' + svc.title + '"></div>' +
-        '<div class="half"><span class="ba-tag">بعد</span><img src="' + pair.after + '" alt="نمونه‌ی بعد — ' + svc.title + '"></div>' +
-      '</div></div>';
+      const afterPos = pair.afterPos || '50% 20%';
+      const beforePos = pair.beforePos || '50% 20%';
+      return '<div class="svc-pair-slide">' +
+        '<div class="ba-slider" role="slider" aria-label="کشیدنِ مقایسه‌ی قبل و بعد — ' + svc.title + '" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0">' +
+          '<div class="ba-after" style="background-image:url(&quot;' + pair.after + '&quot;);background-position:' + afterPos + '"><span class="ba-tag l">بعد</span></div>' +
+          '<div class="ba-before" style="background-image:url(&quot;' + pair.before + '&quot;);background-position:' + beforePos + '"><span class="ba-tag r">قبل</span></div>' +
+          '<div class="ba-handle"><span class="knob">⇔</span></div>' +
+        '</div>' +
+      '</div>';
     }
 
     let mediaInner;
@@ -407,6 +454,7 @@
     }
     svcModalMedia.innerHTML = mediaInner;
     document.getElementById('svcCloseInner').addEventListener('click', closeSvcModal);
+    if (hasDetail) initBaSliders(svcModalMedia);
     if (hasDetail && svc.detail.length > 1) {
       const carousel = document.getElementById('svcPairCarousel');
       const dots = document.querySelectorAll('#svcPairDots .dot');

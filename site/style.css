@@ -219,9 +219,6 @@ body.loaded { opacity: 1; }
 .svc-icon-badge svg { width: 22px; height: 22px; }
 .svc-icon-badge.lg { width: 64px; height: 64px; }
 .svc-icon-badge.lg svg { width: 32px; height: 32px; }
-.svc-pair { position: absolute; inset: 0; display: flex; direction: ltr; gap: 4px; background: var(--cream-2); }
-.svc-pair .half { position: relative; flex: 1; overflow: hidden; }
-.svc-pair .half img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; }
 .svc-pair-carousel { position: absolute; inset: 0; display: flex; direction: ltr; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .svc-pair-carousel::-webkit-scrollbar { display: none; }
 .svc-pair-track { display: flex; direction: ltr; width: 100%; }
@@ -229,12 +226,34 @@ body.loaded { opacity: 1; }
 .svc-pair-dots { position: absolute; z-index: 3; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; }
 .svc-pair-dots .dot { width: 6px; height: 6px; border-radius: 999px; background: oklch(100% 0 0 / 0.5); transition: background .2s ease, width .2s ease; }
 .svc-pair-dots .dot.active { width: 16px; background: oklch(100% 0 0 / 0.95); }
-.svc-pair .ba-tag {
-  position: absolute; z-index: 4; top: 4px; font-size: 6.5px; font-weight: 700; color: var(--dark-ink); padding: 2px 5px; border-radius: 999px;
-  background: oklch(15% 0.03 195 / 0.55); border: 1px solid oklch(100% 0 0 / 0.22);
+
+/* ============ اسلایدرِ کشیدنیِ قبل/بعد — دستگیره رو می‌کشی، عکسِ «بعد» زیرِ عکسِ «قبل» آشکار می‌شه ============
+   لایه‌ی زیرین (ba-after) همیشه کاملِ کادره؛ لایه‌ی روییِ (ba-before) با clip-path بریده می‌شه —
+   نه با تغییرِ width، چون تغییرِ width خودِ background-size:cover رو هم عوض می‌کرد و عکس لِه می‌شد. */
+.ba-slider { position: absolute; inset: 0; overflow: hidden; direction: ltr; }
+.ba-slider .ba-after, .ba-slider .ba-before {
+  position: absolute; inset: 0; background-size: cover; background-position: 50% 20%;
 }
-.svc-pair .half:first-child .ba-tag { left: 4px; }
-.svc-pair .half:last-child .ba-tag { right: 4px; }
+.ba-slider .ba-before { clip-path: inset(0 0 0 50%); }
+.ba-slider .ba-tag {
+  position: absolute; z-index: 2; top: 4px; font-size: 6.5px; font-weight: 700; color: var(--dark-ink); padding: 2px 5px; border-radius: 999px;
+  background: oklch(15% 0.03 195 / 0.55); border: 1px solid oklch(100% 0 0 / 0.22); pointer-events: none;
+}
+.ba-slider .ba-tag.l { left: 4px; }
+.ba-slider .ba-tag.r { right: 4px; }
+.ba-handle {
+  position: absolute; top: 0; bottom: 0; left: 50%; width: 32px; margin-inline-start: -16px; z-index: 3;
+  display: flex; align-items: center; justify-content: center; cursor: ew-resize; touch-action: none;
+}
+.ba-handle::before {
+  content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; transform: translateX(-50%);
+  background: oklch(100% 0 0 / 0.9); box-shadow: 0 0 0 1px oklch(15% 0.03 195 / 0.25);
+}
+.ba-handle .knob {
+  position: relative; width: 26px; height: 26px; border-radius: 50%; background: oklch(100% 0 0 / 0.95);
+  display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--ink-2);
+  box-shadow: 0 2px 8px oklch(15% 0.03 195 / 0.3);
+}
 .svc-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 .svc-title-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
 .svc-chip { flex-shrink: 0; font-size: 8.5px; font-weight: 700; padding: 4px 9px; border-radius: 999px; white-space: nowrap; }
@@ -256,9 +275,10 @@ body.loaded { opacity: 1; }
 .modal-media img { width: 100%; height: 100%; object-fit: cover; }
 .modal-media-pending { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: repeating-linear-gradient(135deg, var(--cream-2) 0 10px, oklch(93.5% 0.018 72 / 0.5) 10px 20px); }
 .modal-media-pending svg { width: 30px; height: 30px; color: var(--ink-3); }
-.modal-media .svc-pair .ba-tag { font-size: 10px; padding: 5px 11px; top: 12px; }
-.modal-media .svc-pair .half:first-child .ba-tag { left: 12px; top: 56px; }
-.modal-media .svc-pair .half:last-child .ba-tag { right: 12px; }
+.modal-media .ba-slider .ba-tag { font-size: 10px; padding: 5px 11px; top: 12px; }
+.modal-media .ba-slider .ba-tag.l { left: 12px; top: 56px; }
+.modal-media .ba-slider .ba-tag.r { right: 12px; }
+.modal-media .ba-handle .knob { width: 34px; height: 34px; font-size: 15px; }
 .svc-facts { margin-top: 8px; }
 .svc-variants-label { font-size: 11px; color: var(--ink-2); margin-top: 12px; }
 .svc-variants { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }

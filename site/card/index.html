@@ -148,16 +148,22 @@
   .service-card .fill svg { width: 19px; height: 19px; color: var(--ink-3); }
   .service-card .label { font-size: 10.5px; font-weight: 600; color: var(--ink); text-align: center; padding: 7px 4px; }
 
-  /* گالریِ قبل/بعد — هم‌سبک با سایتِ اصلی: جفت‌عکسِ قبل|بعد با برچسب، بدونِ بلورِ زنده */
+  /* گالریِ قبل/بعد — الان یه اسلایدرِ کشیدنیه: دستگیره رو می‌کشی، عکسِ «بعد» زیرِ عکسِ «قبل» آشکار می‌شه.
+     لایه‌ی زیرین (ba-after) کاملِ کادره؛ لایه‌ی روییِ (ba-before) با clip-path بریده می‌شه، نه با width،
+     چون تغییرِ width خودِ background-size:cover رو هم عوض می‌کنه و عکس کش میاد/له می‌شه. */
   .ba-carousel { position: relative; aspect-ratio: 16/10; border-radius: 16px; overflow: hidden; background: var(--card); box-shadow: 0 1px 2px oklch(30% 0.02 40 / 0.05); }
   .ba-track { display: flex; direction: ltr; width: 100%; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
   .ba-track::-webkit-scrollbar { display: none; }
-  .ba-slide { position: relative; flex: 0 0 100%; scroll-snap-align: start; display: flex; direction: ltr; gap: 4px; }
-  .ba-slide .half { position: relative; flex: 1; overflow: hidden; }
-  .ba-slide .half img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; display: block; }
-  .ba-slide .ba-tag { position: absolute; z-index: 2; top: 10px; font-size: 10px; font-weight: 700; color: #fff; padding: 4px 10px; border-radius: 999px; background: oklch(15% 0.03 195 / 0.55); border: 1px solid oklch(100% 0 0 / 0.22); }
-  .ba-slide .half:first-child .ba-tag { left: 10px; }
-  .ba-slide .half:last-child .ba-tag { right: 10px; }
+  .ba-slide { position: relative; flex: 0 0 100%; scroll-snap-align: start; direction: ltr; overflow: hidden; }
+  .ba-slider { position: absolute; inset: 0; overflow: hidden; direction: ltr; }
+  .ba-slider .ba-after, .ba-slider .ba-before { position: absolute; inset: 0; background-size: cover; background-position: 50% 20%; }
+  .ba-slider .ba-before { clip-path: inset(0 0 0 50%); }
+  .ba-slide .ba-tag { position: absolute; z-index: 2; top: 10px; font-size: 10px; font-weight: 700; color: #fff; padding: 4px 10px; border-radius: 999px; background: oklch(15% 0.03 195 / 0.55); border: 1px solid oklch(100% 0 0 / 0.22); pointer-events: none; }
+  .ba-slide .ba-tag.l { left: 10px; }
+  .ba-slide .ba-tag.r { right: 10px; }
+  .ba-handle { position: absolute; top: 0; bottom: 0; left: 50%; width: 34px; margin-inline-start: -17px; z-index: 3; display: flex; align-items: center; justify-content: center; cursor: ew-resize; touch-action: none; }
+  .ba-handle::before { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; transform: translateX(-50%); background: oklch(100% 0 0 / 0.9); box-shadow: 0 0 0 1px oklch(15% 0.03 195 / 0.25); }
+  .ba-handle .knob { position: relative; width: 32px; height: 32px; border-radius: 50%; background: oklch(100% 0 0 / 0.95); display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--ink-2); box-shadow: 0 2px 8px oklch(15% 0.03 195 / 0.3); }
   .ba-dots { position: absolute; z-index: 3; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; }
   .ba-dots .dot { width: 6px; height: 6px; border-radius: 999px; background: oklch(100% 0 0 / 0.5); transition: background .2s ease, width .2s ease; }
   .ba-dots .dot.active { width: 16px; background: oklch(100% 0 0 / 0.95); }
@@ -346,12 +352,18 @@
         <div class="ba-carousel">
           <div class="ba-track" id="baTrack">
             <div class="ba-slide">
-              <div class="half"><span class="ba-tag">قبل</span><img src="assets/hero-before.jpg" alt="نمونه‌ی قبل — فیلر لب"></div>
-              <div class="half"><span class="ba-tag">بعد</span><img src="assets/hero-after.jpg" alt="نمونه‌ی بعد — فیلر لب"></div>
+              <div class="ba-slider" role="slider" aria-label="کشیدنِ مقایسه‌ی قبل و بعد — فیلر لب" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0">
+                <div class="ba-after" style="background-image:url('assets/hero-after.jpg');background-position:50% 72%"><span class="ba-tag l">بعد</span></div>
+                <div class="ba-before" style="background-image:url('assets/hero-before.jpg');background-position:50% 45%"><span class="ba-tag r">قبل</span></div>
+                <div class="ba-handle"><span class="knob">⇔</span></div>
+              </div>
             </div>
             <div class="ba-slide">
-              <div class="half"><span class="ba-tag">قبل</span><img src="assets/hero-before-2.jpg" alt="نمونه‌ی قبل — فیلر لب"></div>
-              <div class="half"><span class="ba-tag">بعد</span><img src="assets/hero-after-2.jpg" alt="نمونه‌ی بعد — فیلر لب"></div>
+              <div class="ba-slider" role="slider" aria-label="کشیدنِ مقایسه‌ی قبل و بعد — فیلر لب" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0">
+                <div class="ba-after" style="background-image:url('assets/hero-after-2.jpg')"><span class="ba-tag l">بعد</span></div>
+                <div class="ba-before" style="background-image:url('assets/hero-before-2.jpg')"><span class="ba-tag r">قبل</span></div>
+                <div class="ba-handle"><span class="knob">⇔</span></div>
+              </div>
             </div>
           </div>
           <div class="ba-dots" id="baDots"><span class="dot active"></span><span class="dot"></span></div>
@@ -437,6 +449,49 @@
         baDots.forEach((d, i) => d.classList.toggle('active', i === idx));
       });
     }
+
+    /* اسلایدرِ کشیدنیِ قبل/بعد: فقط خودِ دستگیره قابلِ‌کشیدنه (نه کلِ عکس)، تا با سوایپِ افقیِ
+       کاروسلِ بینِ چند نمونه (baTrack) تداخل نکنه. */
+    function initBaSliders(scopeEl) {
+      scopeEl.querySelectorAll('.ba-slider').forEach((slider) => {
+        const before = slider.querySelector('.ba-before');
+        const handle = slider.querySelector('.ba-handle');
+        if (!before || !handle) return;
+
+        function setPct(pct) {
+          pct = Math.max(0, Math.min(100, pct));
+          before.style.clipPath = 'inset(0 0 0 ' + pct + '%)';
+          handle.style.left = pct + '%';
+          slider.setAttribute('aria-valuenow', String(Math.round(100 - pct)));
+        }
+        function pctFromClientX(clientX) {
+          const rect = slider.getBoundingClientRect();
+          return ((clientX - rect.left) / rect.width) * 100;
+        }
+        function onMove(e) {
+          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          setPct(pctFromClientX(clientX));
+        }
+        function stopDrag() {
+          document.removeEventListener('pointermove', onMove);
+          document.removeEventListener('pointerup', stopDrag);
+        }
+        function startDrag(e) {
+          e.preventDefault();
+          onMove(e);
+          document.addEventListener('pointermove', onMove);
+          document.addEventListener('pointerup', stopDrag);
+        }
+        handle.addEventListener('pointerdown', startDrag);
+        slider.addEventListener('keydown', (e) => {
+          const current = parseFloat(handle.style.left) || 50;
+          if (e.key === 'ArrowLeft') { setPct(current - 5); e.preventDefault(); }
+          else if (e.key === 'ArrowRight') { setPct(current + 5); e.preventDefault(); }
+        });
+        setPct(50);
+      });
+    }
+    initBaSliders(document);
   </script>
 
 </body>
