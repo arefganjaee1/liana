@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>خدمات — پنلِ مدیریتِ لیانا</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="app-shell" id="shellRoot">
+  <aside class="sidebar">
+    <div class="brand"><span class="mark"><img src="assets/logo.png" alt=""></span><span>لیانا</span></div>
+    <nav>
+      <a href="/admin/services.html" data-key="services"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="7" rx="1.6"/><rect x="14" y="4" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6" opacity=".45"/><rect x="14" y="14" width="7" height="7" rx="1.6"/></svg><span>خدمات</span></a>
+      <a href="/admin/staff.html" data-key="staff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M2.5 20c0-3.6 2.9-6.2 6.5-6.2s6.5 2.6 6.5 6.2"/><circle cx="17.5" cy="9" r="2.3"/><path d="M16 13.4c2.6.2 4.9 2.2 4.9 5.4"/></svg><span>پرسنل</span></a>
+    </nav>
+    <div class="spacer"></div>
+    <div class="user-box">
+      <div class="who"></div>
+      <span class="role-badge"></span>
+      <button class="logout-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4.5h3a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2h-3"/><path d="M10 8l-4 4 4 4"/><path d="M6 12h11.5"/></svg><span>خروج</span></button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <div class="eyebrow-label">پنلِ مدیریتِ لیانا</div>
+        <h1>خدمات</h1>
+        <div class="sub">هر چیزی که اینجا اضافه/ویرایش کنی، بعداً همون چیزیه که تو سایت و موتورِ رزرو دیده می‌شه.</div>
+      </div>
+      <button class="btn btn-primary" id="addServiceBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg><span>افزودنِ خدمتِ جدید</span></button>
+    </div>
+
+    <div class="card">
+      <table class="table" id="servicesTable">
+        <thead>
+          <tr>
+            <th>عنوان</th>
+            <th>دسته‌بندی</th>
+            <th>قیمت</th>
+            <th>مدت</th>
+            <th>پرسنل</th>
+            <th>عکس‌ها</th>
+            <th>وضعیت</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="servicesBody"></tbody>
+      </table>
+      <div class="empty-state" id="emptyState" style="display:none">
+        <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7 10 4h4l2 3"/><circle cx="12" cy="13.5" r="3.3"/></svg></div>
+        <div>هنوز خدمتی اضافه نشده.</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="modal-backdrop" id="modalBackdrop" style="display:none">
+  <div class="modal">
+    <h2 id="modalTitle">افزودنِ خدمتِ جدید</h2>
+    <p class="modal-sub" id="modalSub">اول اطلاعاتِ پایه رو بزن و ذخیره کن، بعد می‌تونی عکس/variant/پرسنل اضافه کنی.</p>
+
+    <div class="field">
+      <label>عنوانِ خدمت</label>
+      <input type="text" id="f_title" placeholder="مثلاً بوتاکس و فیلر">
+    </div>
+    <div class="field">
+      <label>توضیح</label>
+      <textarea id="f_description" placeholder="یه توضیحِ کوتاه برای مشتری"></textarea>
+    </div>
+    <div class="row-3">
+      <div class="field">
+        <label>دسته‌بندی</label>
+        <select id="f_category">
+          <option value="">—</option>
+          <option value="inj">تزریقات</option>
+          <option value="skin">پوست و لیزر</option>
+          <option value="weight-loss">لاغری</option>
+          <option value="massage">ماساژ</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>قیمت (تومان)</label>
+        <input type="number" id="f_price" placeholder="خالی = بعد از مشاوره">
+      </div>
+      <div class="field">
+        <label>مدت‌زمان (دقیقه)</label>
+        <input type="number" id="f_duration" placeholder="مثلاً 30">
+      </div>
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="f_active" checked>
+      <label for="f_active">این خدمت فعال و قابل‌نمایش باشه</label>
+    </div>
+
+    <div id="afterCreateSections" style="display:none">
+      <div class="card" style="background:var(--cream); box-shadow:none; border:1px solid var(--border); margin-top:16px;">
+        <div class="section-title">
+          variantها (اگه این خدمت چند حالت داره)
+          <button class="btn btn-ghost btn-sm" id="addVariantBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg><span>افزودن</span></button>
+        </div>
+        <div id="variantsList"></div>
+        <div class="hint" style="margin-top:6px">اگه قیمت/مدتِ variant رو خالی بذاری، از قیمت/مدتِ خودِ خدمت استفاده می‌شه.</div>
+      </div>
+
+      <div class="card" style="background:var(--cream); box-shadow:none; border:1px solid var(--border); margin-top:12px;">
+        <div class="section-title">پرسنلی که این خدمت رو انجام می‌دن</div>
+        <div id="staffCheckList"></div>
+      </div>
+
+      <div class="card" style="background:var(--cream); box-shadow:none; border:1px solid var(--border); margin-top:12px;">
+        <div class="section-title">عکس‌ها</div>
+        <div class="img-grid" id="imagesGrid"></div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="closeModalBtn">بستن</button>
+      <button class="btn btn-primary" id="saveServiceBtn">ذخیره</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/services.js"></script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ورود — پنلِ مدیریتِ لیانا</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="login-wrap">
+  <form class="login-card" id="loginForm">
+    <div class="mark"><img src="assets/logo.png" alt=""></div>
+    <div class="brand">لیانا</div>
+    <div class="sub">پنلِ مدیریتِ کلینیک</div>
+    <div class="login-error" id="loginError"></div>
+    <div class="field">
+      <label>نام‌کاربری</label>
+      <input type="text" id="username" autocomplete="username" required>
+    </div>
+    <div class="field">
+      <label>رمزِ عبور</label>
+      <input type="password" id="password" autocomplete="current-password" required>
+    </div>
+    <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;" id="loginBtn">ورود</button>
+  </form>
+</div>
+<script src="js/api.js"></script>
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errEl = document.getElementById('loginError');
+  errEl.className = 'login-error';
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  btn.textContent = 'در حالِ ورود...';
+  try {
+    await apiPost('/auth/login', {
+      username: document.getElementById('username').value.trim(),
+      password: document.getElementById('password').value,
+    });
+    window.location.href = '/admin/services.html';
+  } catch (err) {
+    errEl.textContent = err.message || 'ورود ناموفق بود';
+    errEl.className = 'login-error show';
+    btn.disabled = false;
+    btn.textContent = 'ورود';
+  }
+});
+</script>
+</body>
+</html>
