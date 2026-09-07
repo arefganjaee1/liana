@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ابزارِ تنظیمِ کادرِ عکس‌های قبل/بعد — لیانا</title>
+<style>
+  :root {
+    --cream: oklch(97% 0.012 75);
+    --cream-2: oklch(93.5% 0.018 72);
+    --sand: oklch(89% 0.028 70);
+    --ink: oklch(23% 0.02 45);
+    --ink-2: oklch(46% 0.018 45);
+    --ink-3: oklch(60% 0.014 45);
+    --accent: oklch(40% 0.06 182.5);
+    --accent-strong: oklch(33% 0.062 182.5);
+    --accent-light: oklch(71.4% 0.052 185.5);
+    --accent-ink: oklch(98% 0.008 75);
+    --dark-ink: oklch(95% 0.012 75);
+    --ok: oklch(55% 0.12 150);
+    --warn: oklch(60% 0.14 55);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: 'Vazirmatn', Tahoma, sans-serif; background: var(--cream); color: var(--ink);
+    padding: 20px 16px 80px;
+  }
+  h1 { font-size: 18px; font-weight: 800; margin: 0 0 4px; }
+  .lede { font-size: 13px; color: var(--ink-2); line-height: 1.9; max-width: 720px; margin: 0 0 20px; }
+  .lede b { color: var(--ink); }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 760px) { .cols { grid-template-columns: 1fr; } }
+
+  .card { background: #fff; border: 1px solid oklch(23% 0.02 45 / 0.08); border-radius: 14px; padding: 14px; }
+  .card h2 { font-size: 14px; font-weight: 800; margin: 0 0 10px; display: flex; align-items: center; gap: 8px; }
+  .card h2 .tag { font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: var(--sand); color: var(--ink-2); }
+  .card.role-before h2 .tag { background: oklch(93.5% 0.018 72); color: var(--ink-2); }
+  .card.role-after h2 .tag { background: var(--accent); color: var(--accent-ink); }
+
+  .drop {
+    border: 2px dashed oklch(23% 0.02 45 / 0.18); border-radius: 10px; padding: 18px; text-align: center;
+    font-size: 12.5px; color: var(--ink-3); cursor: pointer; transition: background .15s ease, border-color .15s ease;
+  }
+  .drop:hover, .drop.drag { background: var(--cream-2); border-color: var(--accent-light); }
+  .drop input { display: none; }
+
+  .frames { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+  .frame-block { display: flex; flex-direction: column; gap: 5px; }
+  .frame-block .lbl { font-size: 10.5px; color: var(--ink-3); font-weight: 700; }
+  .frame {
+    position: relative; width: 100%; overflow: hidden; border-radius: 8px; background: var(--cream-2);
+    cursor: grab; direction: ltr; touch-action: none; border: 1px solid oklch(23% 0.02 45 / 0.1);
+  }
+  .frame.dragging { cursor: grabbing; }
+  .frame .bg { position: absolute; inset: 0; background-size: cover; background-repeat: no-repeat; pointer-events: none; }
+  .frame .crosshair {
+    position: absolute; left: 50%; top: 50%; width: 14px; height: 14px; transform: translate(-50%,-50%);
+    border: 1.5px solid oklch(100% 0 0 / 0.85); border-radius: 50%; pointer-events: none;
+    box-shadow: 0 0 0 1px oklch(15% 0.03 195 / 0.35);
+  }
+  .aspect-1610 { aspect-ratio: 16/10; }
+  .aspect-168 { aspect-ratio: 16/8; }
+
+  .readout { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; font-size: 11.5px; color: var(--ink-2); }
+  .readout code { direction: ltr; font-size: 12px; font-weight: 700; color: var(--ink); background: var(--cream-2); padding: 3px 8px; border-radius: 6px; }
+  .reset-btn { font-size: 11px; font-weight: 700; color: var(--accent); background: none; border: none; cursor: pointer; padding: 4px 6px; }
+  .reset-btn:hover { text-decoration: underline; }
+
+  .hint { font-size: 11px; color: var(--ink-3); margin-top: 8px; line-height: 1.7; }
+
+  .live-section { margin-top: 24px; }
+  .live-section h2 { font-size: 15px; font-weight: 800; margin: 0 0 4px; }
+  .live-section .sub { font-size: 12px; color: var(--ink-2); margin: 0 0 14px; }
+  .live-frames { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 760px) { .live-frames { grid-template-columns: 1fr; } }
+  .live-frame-wrap .lbl { font-size: 11px; color: var(--ink-3); font-weight: 700; margin-bottom: 6px; }
+
+  .ba-slider { position: relative; width: 100%; overflow: hidden; border-radius: 12px; direction: ltr; background: var(--cream-2); touch-action: none; }
+  .ba-slider .ba-after, .ba-slider .ba-before { position: absolute; inset: 0; background-size: cover; background-repeat: no-repeat; }
+  .ba-slider .ba-before { clip-path: inset(0 0 0 50%); }
+  .ba-slider .ba-tag {
+    position: absolute; z-index: 2; top: 10px; font-size: 10px; font-weight: 700; color: var(--dark-ink); padding: 4px 10px; border-radius: 999px;
+    background: oklch(15% 0.03 195 / 0.55); border: 1px solid oklch(100% 0 0 / 0.22); pointer-events: none;
+  }
+  .ba-slider .ba-tag.l { left: 10px; }
+  .ba-slider .ba-tag.r { right: 10px; }
+  .ba-handle {
+    position: absolute; top: 0; bottom: 0; left: 50%; width: 40px; margin-inline-start: -20px; z-index: 3;
+    display: flex; align-items: center; justify-content: center; cursor: ew-resize; touch-action: none;
+  }
+  .ba-handle::before {
+    content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; transform: translateX(-50%);
+    background: oklch(100% 0 0 / 0.9); box-shadow: 0 0 0 1px oklch(15% 0.03 195 / 0.25);
+  }
+  .ba-handle .knob {
+    position: relative; width: 34px; height: 34px; border-radius: 50%; background: oklch(100% 0 0 / 0.95);
+    display: flex; align-items: center; justify-content: center; font-size: 15px; color: var(--ink-2);
+    box-shadow: 0 2px 8px oklch(15% 0.03 195 / 0.3);
+  }
+  .empty-note { font-size: 12px; color: var(--ink-3); text-align: center; padding: 30px 10px; }
+
+  .output { margin-top: 22px; background: var(--ink); color: var(--dark-ink); border-radius: 12px; padding: 16px; }
+  .output h2 { font-size: 14px; font-weight: 800; margin: 0 0 8px; color: #fff; }
+  .output textarea {
+    width: 100%; min-height: 70px; direction: ltr; text-align: left; font-family: ui-monospace, monospace; font-size: 12.5px;
+    background: oklch(15% 0.02 45); color: var(--dark-ink); border: 1px solid oklch(100% 0 0 / 0.12); border-radius: 8px; padding: 10px; resize: vertical;
+  }
+  .output .row { display: flex; gap: 10px; margin-top: 10px; align-items: center; }
+  .copy-btn { font-size: 12.5px; font-weight: 700; background: var(--accent); color: var(--accent-ink); border: none; border-radius: 8px; padding: 8px 16px; cursor: pointer; }
+  .copy-btn:hover { background: var(--accent-strong); }
+  .copy-status { font-size: 11.5px; color: var(--accent-light); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>ابزارِ تنظیمِ کادرِ عکس‌های قبل/بعد</h1>
+  <p class="lede">
+    عکسِ «قبل» و «بعد» رو اینجا بارگذاری کن. رو هرکدوم از دو پیش‌نمایش (کارت/موبایل و دسکتاپ) بکش تا جای درستِ عکس رو پیدا کنی —
+    هدف اینه که تو <b>هر دو</b> قاب، همون ناحیه‌ای که می‌خوای نشون بدی (مثلاً لب) دیده بشه، نه یه تیکه‌ی دیگه از صورت.
+    پایینِ صفحه هم یه پیش‌نمایشِ زنده‌ی دقیقاً مثلِ خودِ سایت هست که می‌تونی بکشیش و نتیجه رو از نزدیک ببینی.
+    وقتی راضی شدی، متنِ پایینِ صفحه رو کپی کن و برام بفرست.
+  </p>
+
+  <div class="cols">
+    <div class="card role-before" id="cardBefore">
+      <h2>عکسِ «قبل» <span class="tag">قبل</span></h2>
+      <label class="drop" id="dropBefore">
+        <input type="file" accept="image/*" id="fileBefore">
+        <span id="dropTextBefore">برای انتخاب عکس کلیک کن، یا بکش و اینجا رها کن</span>
+      </label>
+      <div class="frames" id="framesBefore" style="display:none"></div>
+      <div class="readout" id="readoutBefore" style="display:none"></div>
+      <p class="hint">اگه دو تا قاب یه‌جور نشد، اونی که مهم‌تره (معمولاً موبایل) رو اول درست کن، بعد یه‌کم رو دسکتاپ هم چک کن.</p>
+    </div>
+
+    <div class="card role-after" id="cardAfter">
+      <h2>عکسِ «بعد» <span class="tag">بعد</span></h2>
+      <label class="drop" id="dropAfter">
+        <input type="file" accept="image/*" id="fileAfter">
+        <span id="dropTextAfter">برای انتخاب عکس کلیک کن، یا بکش و اینجا رها کن</span>
+      </label>
+      <div class="frames" id="framesAfter" style="display:none"></div>
+      <div class="readout" id="readoutAfter" style="display:none"></div>
+      <p class="hint">اگه دو تا قاب یه‌جور نشد، اونی که مهم‌تره (معمولاً موبایل) رو اول درست کن، بعد یه‌کم رو دسکتاپ هم چک کن.</p>
+    </div>
+  </div>
+
+  <div class="live-section">
+    <h2>پیش‌نمایشِ زنده — دقیقاً مثلِ خودِ سایت</h2>
+    <p class="sub">دستگیره رو بکش و ببین قبل/بعد چطور کنارِ هم دیده می‌شن. اگه هر دو عکس رو بارگذاری کرده باشی، اینجا فعال می‌شه.</p>
+    <div class="live-frames">
+      <div class="live-frame-wrap">
+        <div class="lbl">کارت / موبایلِ سایت — نسبتِ ۱۶:۱۰</div>
+        <div class="ba-slider aspect-1610" id="liveSlider1610">
+          <div class="empty-note" id="emptyNote1610">هر دو عکس رو بارگذاری کن</div>
+        </div>
+      </div>
+      <div class="live-frame-wrap">
+        <div class="lbl">دسکتاپِ سایت — نسبتِ ۱۶:۸</div>
+        <div class="ba-slider aspect-168" id="liveSlider168">
+          <div class="empty-note" id="emptyNote168">هر دو عکس رو بارگذاری کن</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="output">
+    <h2>کدِ نهایی — این رو برای کلود بفرست</h2>
+    <textarea id="outputText" readonly></textarea>
+    <div class="row">
+      <button class="copy-btn" id="copyBtn">کپیِ متن</button>
+      <span class="copy-status" id="copyStatus"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const ASPECTS = [
+    { key: '1610', ratio: 16/10, label: 'کارت/موبایل ۱۶:۱۰' },
+    { key: '168', ratio: 16/8, label: 'دسکتاپ ۱۶:۸' }
+  ];
+
+  const state = {
+    before: { img: null, natW: 0, natH: 0, x: 50, y: 50 },
+    after: { img: null, natW: 0, natH: 0, x: 50, y: 50 }
+  };
+
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  function buildFrames(role) {
+    const container = document.getElementById('frames' + cap(role));
+    container.innerHTML = '';
+    ASPECTS.forEach(a => {
+      const block = document.createElement('div');
+      block.className = 'frame-block';
+      const lbl = document.createElement('div');
+      lbl.className = 'lbl';
+      lbl.textContent = a.label;
+      const frame = document.createElement('div');
+      frame.className = 'frame ' + (a.key === '1610' ? 'aspect-1610' : 'aspect-168');
+      frame.dataset.role = role;
+      frame.dataset.aspectKey = a.key;
+      const bg = document.createElement('div');
+      bg.className = 'bg';
+      frame.appendChild(bg);
+      const crosshair = document.createElement('div');
+      crosshair.className = 'crosshair';
+      frame.appendChild(crosshair);
+      block.appendChild(lbl);
+      block.appendChild(frame);
+      container.appendChild(block);
+      attachDrag(frame, role);
+    });
+    container.style.display = 'grid';
+  }
+
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  function renderRole(role) {
+    const st = state[role];
+    if (!st.img) return;
+    const bgUrl = 'url("' + st.img + '")';
+    const pos = st.x.toFixed(1) + '% ' + st.y.toFixed(1) + '%';
+    document.querySelectorAll('#frames' + cap(role) + ' .bg').forEach(el => {
+      el.style.backgroundImage = bgUrl;
+      el.style.backgroundPosition = pos;
+    });
+    const readout = document.getElementById('readout' + cap(role));
+    readout.style.display = 'flex';
+    readout.innerHTML = '<span>موقعیتِ فعلی: <code>' + pos + '</code></span>' +
+      '<button class="reset-btn" data-role="' + role + '">بازنشانی به وسط</button>';
+    readout.querySelector('.reset-btn').addEventListener('click', () => {
+      st.x = 50; st.y = 50;
+      renderRole(role);
+      renderLive();
+      renderOutput();
+    });
+    renderLive();
+    renderOutput();
+  }
+
+  function attachDrag(frame, role) {
+    let dragging = false;
+    let startX, startY, startPX, startPY, rect, excessX, excessY;
+
+    function computeExcess() {
+      const st = state[role];
+      rect = frame.getBoundingClientRect();
+      const boxW = rect.width, boxH = rect.height;
+      const scale = Math.max(boxW / st.natW, boxH / st.natH);
+      const scaledW = st.natW * scale, scaledH = st.natH * scale;
+      excessX = scaledW - boxW;
+      excessY = scaledH - boxH;
+    }
+
+    function onDown(e) {
+      const st = state[role];
+      if (!st.img) return;
+      dragging = true;
+      frame.classList.add('dragging');
+      const pt = e.touches ? e.touches[0] : e;
+      startX = pt.clientX; startY = pt.clientY;
+      startPX = st.x; startPY = st.y;
+      computeExcess();
+      e.preventDefault();
+    }
+    function onMove(e) {
+      if (!dragging) return;
+      const st = state[role];
+      const pt = e.touches ? e.touches[0] : e;
+      const dx = pt.clientX - startX;
+      const dy = pt.clientY - startY;
+      if (excessX > 0) st.x = clamp(startPX - (100 * dx / excessX), 0, 100);
+      if (excessY > 0) st.y = clamp(startPY - (100 * dy / excessY), 0, 100);
+      renderRole(role);
+      e.preventDefault();
+    }
+    function onUp() {
+      dragging = false;
+      frame.classList.remove('dragging');
+    }
+    frame.addEventListener('pointerdown', onDown);
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+  }
+
+  function loadFile(role, file) {
+    if (!file || !file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target.result;
+      const img = new Image();
+      img.onload = () => {
+        state[role].img = dataUrl;
+        state[role].natW = img.naturalWidth;
+        state[role].natH = img.naturalHeight;
+        state[role].x = 50;
+        state[role].y = 50;
+        document.getElementById('drop' + cap(role)).style.display = 'none';
+        buildFrames(role);
+        renderRole(role);
+      };
+      img.src = dataUrl;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  ['before', 'after'].forEach(role => {
+    const drop = document.getElementById('drop' + cap(role));
+    const input = document.getElementById('file' + cap(role));
+    drop.addEventListener('click', () => {}); // label already triggers input
+    input.addEventListener('change', (e) => loadFile(role, e.target.files[0]));
+    drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('drag'); });
+    drop.addEventListener('dragleave', () => drop.classList.remove('drag'));
+    drop.addEventListener('drop', (e) => {
+      e.preventDefault();
+      drop.classList.remove('drag');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) loadFile(role, e.dataTransfer.files[0]);
+    });
+  });
+
+  function renderLive() {
+    const b = state.before, a = state.after;
+    ['1610', '168'].forEach(key => {
+      const el = document.getElementById('liveSlider' + key);
+      const emptyId = 'emptyNote' + key;
+      if (!b.img || !a.img) {
+        el.innerHTML = '<div class="empty-note" id="' + emptyId + '">هر دو عکس رو بارگذاری کن</div>';
+        return;
+      }
+      if (!el.querySelector('.ba-after')) {
+        el.innerHTML =
+          '<div class="ba-after"><span class="ba-tag l">بعد</span></div>' +
+          '<div class="ba-before"><span class="ba-tag r">قبل</span></div>' +
+          '<div class="ba-handle"><span class="knob">&#8646;</span></div>';
+        attachLiveDrag(el);
+      }
+      const afterEl = el.querySelector('.ba-after');
+      const beforeEl = el.querySelector('.ba-before');
+      afterEl.style.backgroundImage = 'url("' + a.img + '")';
+      afterEl.style.backgroundPosition = a.x.toFixed(1) + '% ' + a.y.toFixed(1) + '%';
+      beforeEl.style.backgroundImage = 'url("' + b.img + '")';
+      beforeEl.style.backgroundPosition = b.x.toFixed(1) + '% ' + b.y.toFixed(1) + '%';
+    });
+  }
+
+  function attachLiveDrag(slider) {
+    const before = slider.querySelector('.ba-before');
+    const handle = slider.querySelector('.ba-handle');
+    let dragging = false;
+    function setPct(pct) {
+      pct = clamp(pct, 0, 100);
+      before.style.clipPath = 'inset(0 0 0 ' + pct + '%)';
+      handle.style.left = pct + '%';
+    }
+    setPct(50);
+    function move(clientX) {
+      const rect = slider.getBoundingClientRect();
+      const pct = ((clientX - rect.left) / rect.width) * 100;
+      setPct(pct);
+    }
+    handle.addEventListener('pointerdown', (e) => { dragging = true; e.preventDefault(); });
+    window.addEventListener('pointermove', (e) => { if (dragging) move(e.clientX); });
+    window.addEventListener('pointerup', () => { dragging = false; });
+  }
+
+  function renderOutput() {
+    const b = state.before, a = state.after;
+    const lines = [];
+    if (b.img) lines.push('قبل (before): ' + b.x.toFixed(1) + '% ' + b.y.toFixed(1) + '%');
+    if (a.img) lines.push('بعد (after): ' + a.x.toFixed(1) + '% ' + a.y.toFixed(1) + '%');
+    document.getElementById('outputText').value = lines.length
+      ? lines.join('\n')
+      : 'هنوز عکسی بارگذاری نشده.';
+  }
+
+  document.getElementById('copyBtn').addEventListener('click', () => {
+    const ta = document.getElementById('outputText');
+    ta.select();
+    let ok = false;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value);
+        ok = true;
+      } else {
+        ok = document.execCommand('copy');
+      }
+    } catch (e) { ok = document.execCommand('copy'); }
+    document.getElementById('copyStatus').textContent = ok ? 'کپی شد ✓' : 'نشد کپی بشه — متن رو دستی سلکت کن';
+    setTimeout(() => { document.getElementById('copyStatus').textContent = ''; }, 2500);
+  });
+
+  renderOutput();
+})();
+</script>
+</body>
+</html>
