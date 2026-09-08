@@ -54,6 +54,45 @@
   </a>
 </aside>
 
+
+<section class="case-section">
+  <div class="case-top">
+    <span class="case-eyebrow">نمونه‌کارِ لیانا</span>
+    <h2>یک نگاهِ نزدیک به خدماتِ محبوب</h2>
+    <p class="case-top-sub">عکس و توضیح‌های این بخش موقتی‌ان و با عکسِ واقعیِ عکاسی‌شده جایگزین می‌شن.</p>
+  </div>
+
+  <div class="case-board">
+    <section class="case-panel case-list">
+      <h3>عمل‌های انجام‌شده</h3>
+      <div class="case-items" id="caseItems"></div>
+      <div class="case-list-footer"><b>نمونه‌کارِ اختصاصی</b><p>برای دیدنِ جزئیاتِ هر خدمت، روی ردیف یا نقطه‌ی روی صورت کلیک کن.</p></div>
+    </section>
+
+    <section class="case-hero">
+      <div class="case-badge">LIANA CLINIC · 01</div>
+      <img src="assets/case-model-placeholder.jpg" alt="عکسِ نمونه‌ی موقت">
+      <div class="case-marker cp1" onclick="caseSelect(0)"><label>پیشانی</label><span class="dot"></span></div>
+      <div class="case-marker cp2" onclick="caseSelect(1)"><span class="dot"></span><label>دورِ چشم</label></div>
+      <div class="case-marker cp3" onclick="caseSelect(2)"><span class="dot"></span><label>گونه</label></div>
+      <div class="case-marker cp4" onclick="caseSelect(3)"><label>لب</label><span class="dot"></span></div>
+      <div class="case-counter"><button class="case-nav" onclick="casePrev()">‹</button><span class="case-num" id="caseCounter"></span><button class="case-nav" onclick="caseNext()">›</button></div>
+    </section>
+
+    <section class="case-panel case-detail">
+      <div class="case-kicker">LIANA AESTHETIC CLINIC</div>
+      <div class="case-title" id="caseTitle"></div><div class="case-sub" id="caseSub"></div>
+      <p class="case-copy" id="caseCopy"></p>
+      <h3>مزایای این خدمت</h3>
+      <div class="case-benefits" id="caseBenefits"></div>
+      <div class="case-divider"></div>
+      <div class="case-selected-title">خدماتِ این نمونه‌کار</div>
+      <div class="case-chips" id="caseChips"></div>
+      <div class="case-booking"><a class="case-book tap" id="caseReserveCta" href="sms:+989332650382">رزروِ نوبت ←</a></div>
+    </section>
+  </div>
+</section>
+
 <section class="hero" id="heroSection">
   <div class="hero-media">
     <div class="hero-marquee">
@@ -537,6 +576,44 @@
   } else {
     revealEls.forEach(el => el.classList.add('in-view'));
   }
+</script>
+<script>
+(function(){
+  var caseData=[
+    {name:"پیشانی", svc:"بوتاکس", desc:"کاهشِ خطوط و چروک‌های پیشانی", detail:"کاهشِ خطوطِ سطحیِ پیشانی و اخم، با حفظِ حالتِ طبیعیِ صورت.", benefits:["نتیجه‌ی طبیعی و هماهنگ","ظاهرِ شاداب‌تر","بدونِ نیاز به جراحی","دوره‌ی نقاهتِ کوتاه"], thumb:"assets/case-chip-forehead.jpg"},
+    {name:"دورِ چشم", svc:"فیلر", desc:"رفعِ گودی و تیرگیِ زیرِ چشم", detail:"کمک به بهبودِ ظاهرِ گودیِ زیرِ چشم و نمایی شاداب‌تر برای نگاه.", benefits:["کاهشِ ظاهرِ گودی","شاداب‌ترشدنِ نگاه","فرمِ طبیعی","دوره‌ی نقاهتِ کوتاه"], thumb:"assets/case-chip-eye.jpg"},
+    {name:"گونه", svc:"فیلر", desc:"افزایشِ حجم و فرم‌دهیِ گونه‌ها", detail:"فرم‌دهیِ طبیعیِ گونه‌ها برای تعادلِ بیشتر در کانتورِ صورت.", benefits:["فرم‌دهیِ گونه","تعادلِ بیشترِ صورت","نتیجه‌ی طبیعی","بدونِ جراحی"], thumb:"assets/case-chip-cheek.jpg"},
+    {name:"لب", svc:"فیلر", desc:"افزایشِ حجم، فرم‌دهی و تقارنِ لب‌ها", detail:"افزایشِ حجم و فرم‌دهیِ لب‌ها با حفظِ تناسب و ظاهرِ طبیعی.", benefits:["افزایشِ حجمِ لب‌ها","بهبودِ تقارن","فرمِ طبیعی","دوره‌ی نقاهتِ کوتاه"], thumb:"assets/case-chip-lips.jpg"}
+  ];
+  var caseSelected=3;
+  var caseIcons=['✦','◌','♡','◷'];
+
+  function caseReserveText(p){ return 'سلام، می‌خوام برای «'+p.name+' — '+p.svc+'» نوبت بگیرم.'; }
+
+  function caseRender(){
+    var p=caseData[caseSelected];
+    document.getElementById('caseTitle').textContent=p.name;
+    document.getElementById('caseSub').textContent=p.desc+' · '+p.svc;
+    document.getElementById('caseCopy').textContent=p.detail;
+    document.getElementById('caseBenefits').innerHTML=p.benefits.map(function(x,i){
+      return '<div class="case-benefit"><span class="case-bicon">'+caseIcons[i%caseIcons.length]+'</span>'+x+'</div>';
+    }).join('');
+    document.getElementById('caseItems').innerHTML=caseData.map(function(x,i){
+      return '<div class="case-item '+(i===caseSelected?'active':'')+'" onclick="caseSelect('+i+')"><div class="case-thumb"><img src="'+x.thumb+'" alt=""></div><div class="case-ttext"><strong>'+x.name+' — '+x.svc+'</strong><span>'+x.desc+'</span></div><span class="case-chev">‹</span></div>';
+    }).join('');
+    document.getElementById('caseChips').innerHTML=caseData.map(function(x,i){
+      return '<button class="case-chip '+(i===caseSelected?'active':'')+'" onclick="caseSelect('+i+')">'+x.name+'</button>';
+    }).join('');
+    document.getElementById('caseCounter').textContent=String(caseSelected+1).padStart(2,'0')+' / '+String(caseData.length).padStart(2,'0');
+    document.querySelectorAll('.case-marker').forEach(function(m,i){ m.classList.toggle('active', i===caseSelected); });
+    var cta=document.getElementById('caseReserveCta');
+    if (cta) cta.href='sms:+989332650382?body='+encodeURIComponent(caseReserveText(p));
+  }
+  window.caseSelect=function(i){ caseSelected=i; caseRender(); };
+  window.caseNext=function(){ caseSelected=(caseSelected+1)%caseData.length; caseRender(); };
+  window.casePrev=function(){ caseSelected=(caseSelected-1+caseData.length)%caseData.length; caseRender(); };
+  caseRender();
+})();
 </script>
 </body>
 </html>
