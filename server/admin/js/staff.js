@@ -26,9 +26,10 @@ async function loadStaff() {
   const tbody = document.getElementById('staffBody');
   tbody.innerHTML = '';
   document.getElementById('emptyState').style.display = staff.length ? 'none' : 'flex';
-  staff.forEach((s) => {
+  staff.forEach((s, i) => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
+      <td style="color:var(--ink-3); font-variant-numeric:tabular-nums">${i + 1}</td>
       <td><strong>${escapeHtml(s.name)}</strong></td>
       <td><span class="pill ${s.role === 'owner' ? 'owner' : 'staff'}">${s.role === 'owner' ? 'صاحب/مدیر' : 'پرسنل'}</span></td>
       <td><span class="pill ${s.active ? 'active' : 'inactive'}">${s.active ? 'فعال' : 'غیرفعال'}</span></td>

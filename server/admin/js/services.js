@@ -23,9 +23,10 @@ async function loadServices() {
   const tbody = document.getElementById('servicesBody');
   tbody.innerHTML = '';
   document.getElementById('emptyState').style.display = services.length ? 'none' : 'flex';
-  services.forEach((svc) => {
+  services.forEach((svc, i) => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
+      <td style="color:var(--ink-3); font-variant-numeric:tabular-nums">${i + 1}</td>
       <td><strong>${escapeHtml(svc.title)}</strong></td>
       <td>${CATEGORY_LABELS[svc.category] || '—'}</td>
       <td>${fmtPrice(svc.price)}</td>
