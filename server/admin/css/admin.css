@@ -20,6 +20,8 @@
   --danger-bg: oklch(94% 0.03 25);
   --ok: oklch(50% 0.1 145);
   --ok-bg: oklch(94% 0.035 145);
+  --warn: oklch(52% 0.13 70);
+  --warn-bg: oklch(94% 0.05 80);
   --radius-lg: 22px;
   --radius-md: 14px;
   --radius-sm: 10px;
@@ -109,11 +111,15 @@ button { font-family: inherit; cursor: pointer; }
 .pill.inactive { background: var(--cream-2); color: var(--ink-3); }
 .pill.owner { background: var(--sand); color: oklch(40% 0.06 70); }
 .pill.staff { background: var(--cream-2); color: var(--ink-2); }
+.pill.st-pending { background: var(--warn-bg); color: var(--warn); }
+.pill.st-confirmed { background: var(--ok-bg); color: var(--ok); }
+.pill.st-done { background: var(--cream-2); color: var(--ink-2); }
+.pill.st-cancelled { background: var(--danger-bg); color: var(--danger); }
 
 .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
 .field label { font-size: 12px; font-weight: 700; color: var(--ink-2); }
 .field .hint { font-size: 11px; color: var(--ink-3); }
-input[type=text], input[type=number], input[type=password], input[type=time], textarea, select {
+input[type=text], input[type=number], input[type=password], input[type=time], input[type=date], input[type=tel], textarea, select {
   font-family: inherit; font-size: 13.5px; padding: 9px 11px; border-radius: var(--radius-sm); border: 1px solid var(--line);
   background: var(--cream); color: var(--ink); width: 100%;
 }
@@ -202,3 +208,17 @@ textarea { resize: vertical; min-height: 70px; font-family: inherit; }
 .login-card .sub { text-align: center; font-size: 12.5px; color: var(--ink-2); margin-bottom: 22px; }
 .login-error { background: var(--danger-bg); color: var(--danger); font-size: 12.5px; padding: 8px 12px; border-radius: var(--radius-sm); margin-bottom: 12px; display: none; }
 .login-error.show { display: block; }
+
+/* ============ صفحه‌ی نوبت‌ها ============ */
+.bookings-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.bookings-toolbar .date-jump { display: flex; align-items: center; gap: 8px; background: var(--cream); border: 1px solid var(--line); border-radius: 999px; padding: 5px 6px 5px 14px; }
+.bookings-toolbar .date-jump input[type=date] { width: 150px; border: none; background: transparent; padding: 4px 2px; }
+.bookings-toolbar .date-jump input[type=date]:focus { outline: none; }
+.bookings-toolbar .jalali-echo { font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bookings-toolbar .spacer { flex: 1; }
+.bookings-toolbar .btn.active-filter { background: var(--accent); color: var(--accent-ink); }
+.customer-cell strong { display: block; }
+.customer-cell span { display: block; font-size: 11px; color: var(--ink-3); margin-top: 2px; direction: ltr; text-align: right; }
+.dt-cell .d { font-weight: 700; }
+.dt-cell .t { font-size: 11.5px; color: var(--ink-3); margin-top: 2px; font-variant-numeric: tabular-nums; }
+.status-select { font-size: 11px; font-weight: 700; padding: 5px 8px; border-radius: 999px; width: auto; border: 1px solid var(--line); }

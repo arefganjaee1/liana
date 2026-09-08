@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>نوبت‌ها — پنلِ مدیریتِ لیانا</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="app-shell" id="shellRoot">
+  <aside class="sidebar">
+    <div class="brand"><span class="mark"><img src="assets/logo.png" alt=""></span><span>لیانا</span></div>
+    <nav>
+      <a href="/admin/services.html" data-key="services"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="7" rx="1.6"/><rect x="14" y="4" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6" opacity=".45"/><rect x="14" y="14" width="7" height="7" rx="1.6"/></svg><span>خدمات</span></a>
+      <a href="/admin/bookings.html" data-key="bookings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.2"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg><span>نوبت‌ها</span></a>
+      <a href="/admin/staff.html" data-key="staff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M2.5 20c0-3.6 2.9-6.2 6.5-6.2s6.5 2.6 6.5 6.2"/><circle cx="17.5" cy="9" r="2.3"/><path d="M16 13.4c2.6.2 4.9 2.2 4.9 5.4"/></svg><span>پرسنل</span></a>
+    </nav>
+    <div class="spacer"></div>
+    <div class="user-box">
+      <div class="who"></div>
+      <span class="role-badge"></span>
+      <button class="logout-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4.5h3a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2h-3"/><path d="M10 8l-4 4 4 4"/><path d="M6 12h11.5"/></svg><span>خروج</span></button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <div class="eyebrow-label">پنلِ مدیریتِ لیانا</div>
+        <h1>نوبت‌ها</h1>
+        <div class="sub">رزروِ واقعی هنوز از طریقِ پیامک به گوشیِ کلینیک میاد؛ همین‌جا بعدِ هماهنگی با مشتری، نوبت رو ثبت کن.</div>
+      </div>
+      <button class="btn btn-primary" id="addBookingBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg><span>ثبتِ نوبتِ جدید</span></button>
+    </div>
+
+    <div class="card">
+      <div class="bookings-toolbar">
+        <button class="btn btn-ghost btn-sm tap" id="todayBtn">امروز</button>
+        <button class="btn btn-ghost btn-sm tap" id="allBtn">همه‌ی نوبت‌ها</button>
+        <div class="date-jump">
+          <input type="date" id="dateJumpInput">
+          <span class="jalali-echo" id="dateJumpEcho"></span>
+        </div>
+        <div class="spacer"></div>
+        <span class="jalali-echo" id="listSummary"></span>
+      </div>
+
+      <table class="table" id="bookingsTable">
+        <thead>
+          <tr>
+            <th style="width:36px">#</th>
+            <th>مشتری</th>
+            <th>خدمت</th>
+            <th>پرسنل</th>
+            <th>تاریخ / ساعت</th>
+            <th>وضعیت</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="bookingsBody"></tbody>
+      </table>
+      <div class="empty-state" id="emptyState" style="display:none">
+        <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.2"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg></div>
+        <div id="emptyStateText">هنوز نوبتی برایِ این روز ثبت نشده.</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- مودالِ افزودن/ویرایشِ نوبت -->
+<div class="modal-backdrop" id="bookingModalBackdrop" style="display:none">
+  <div class="modal" style="max-width:560px">
+    <h2 id="bookingModalTitle">ثبتِ نوبتِ جدید</h2>
+    <p class="modal-sub">اطلاعاتِ نوبتی که با مشتری هماهنگ شده رو اینجا ثبت کن.</p>
+
+    <div class="row-2">
+      <div class="field">
+        <label>نامِ مشتری</label>
+        <input type="text" id="b_name" placeholder="مثلاً سارا احمدی">
+      </div>
+      <div class="field">
+        <label>شماره‌ی تماس</label>
+        <input type="tel" id="b_phone" dir="ltr" placeholder="09xxxxxxxxx">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>خدمت</label>
+      <select id="b_service"></select>
+    </div>
+    <div class="field" id="b_service_free_row" style="display:none">
+      <label>عنوانِ خدمت (آزاد)</label>
+      <input type="text" id="b_service_free" placeholder="مثلاً مشاوره">
+    </div>
+
+    <div class="field">
+      <label>پرسنل</label>
+      <select id="b_staff"></select>
+    </div>
+
+    <div class="row-3">
+      <div class="field">
+        <label>تاریخ</label>
+        <input type="date" id="b_date">
+        <span class="jalali-echo" id="b_date_echo"></span>
+      </div>
+      <div class="field">
+        <label>ساعت</label>
+        <input type="time" id="b_time" dir="ltr">
+      </div>
+      <div class="field">
+        <label>وضعیت</label>
+        <select id="b_status">
+          <option value="confirmed">تایید شده</option>
+          <option value="pending">در انتظارِ تایید</option>
+          <option value="done">انجام شد</option>
+          <option value="cancelled">لغو شده</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>یادداشت (اختیاری)</label>
+      <textarea id="b_note" placeholder="هر نکته‌ی اضافه‌ای که پذیرش لازمه بدونه"></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="closeBookingModalBtn">بستن</button>
+      <button class="btn btn-primary" id="saveBookingBtn">ذخیره</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/jalali.js"></script>
+<script src="js/bookings.js"></script>
+</body>
+</html>

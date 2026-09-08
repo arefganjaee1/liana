@@ -8,6 +8,7 @@ import { db, uploadsDir } from './db.js';
 import authRoutes from './routes/auth.js';
 import staffRoutes from './routes/staff.js';
 import servicesRoutes from './routes/services.js';
+import bookingsRoutes from './routes/bookings.js';
 import publicRoutes from './routes/public.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -29,6 +30,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/admin/staff', staffRoutes);
 app.use('/api/admin/services', servicesRoutes);
+app.use('/api/admin/bookings', bookingsRoutes);
 app.use('/api/public', publicRoutes);
 
 // عکس‌های آپلودشده — استاتیک

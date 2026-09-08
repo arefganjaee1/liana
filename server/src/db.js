@@ -89,6 +89,25 @@ db.exec(`
     PRIMARY KEY (service_id, staff_id)
   );
 
+  -- نوبت‌ها (دفترچه‌ی رزرو دستیِ پذیرش — رزروِ واقعی هنوز از طریقِ پیامک میاد، پذیرش همینجا ثبتش می‌کنه)
+  CREATE TABLE IF NOT EXISTS bookings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_name TEXT NOT NULL,
+    customer_phone TEXT,
+    service_id INTEGER REFERENCES services(id) ON DELETE SET NULL,
+    service_title TEXT NOT NULL,               -- عنوانِ خدمت لحظه‌ی ثبت؛ حتی اگه بعداً خدمت عوض/حذف بشه تاریخچه درست می‌مونه
+    staff_id INTEGER REFERENCES staff(id) ON DELETE SET NULL,
+    staff_name TEXT,                           -- اسمِ پرسنل لحظه‌ی ثبت (همون منطقِ بالا)
+    booking_date TEXT NOT NULL,                -- 'YYYY-MM-DD' میلادی (فرانت شمسی نمایش می‌ده)
+    booking_time TEXT,                         -- 'HH:MM'
+    status TEXT NOT NULL DEFAULT 'confirmed',  -- 'pending' | 'confirmed' | 'done' | 'cancelled'
+    note TEXT,
+    created_by INTEGER REFERENCES admin_users(id) ON DELETE SET NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_bookings_date ON bookings(booking_date);
+
   -- حساب‌های پنل (ادمین/منیجر)
   CREATE TABLE IF NOT EXISTS admin_users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
