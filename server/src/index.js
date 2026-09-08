@@ -39,6 +39,9 @@ app.use('/uploads', express.static(uploadsDir));
 // خودِ پنلِ مدیریت — یه فرانتِ استاتیکِ ساده، پشتِ همین سرور
 app.use('/admin', express.static(path.join(__dirname, '..', 'admin')));
 
+// آدرسِ ریشه — فعلاً سایتِ اصلی این‌جا نیست، پس مستقیم به لاگینِ پنل هدایت کن
+app.get('/', (req, res) => res.redirect('/admin/login.html'));
+
 // هندلرِ خطای عمومی (مثلاً خطاهای multer)
 app.use((err, req, res, next) => {
   console.error(err);
