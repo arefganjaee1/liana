@@ -3,7 +3,7 @@ let ALL_STAFF = [];
 let CURRENT_SERVICE = null; // خدمتی که الان تو مودال باز شده (بعد از ذخیره‌ی اولیه)
 let VARIANT_ROWS = []; // آرایه‌ی موقتِ variantها قبلِ ذخیره
 
-const CATEGORY_LABELS = { inj: 'تزریقات', skin: 'پوست و لیزر', 'weight-loss': 'لاغری', massage: 'ماساژ' };
+const CATEGORY_LABELS = { inj: 'تزریقات', skin: 'جوان‌سازی پوست', 'weight-loss': 'لاغری', massage: 'ماساژ' };
 
 async function init() {
   CURRENT_USER = await requireLogin();
