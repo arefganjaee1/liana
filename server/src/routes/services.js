@@ -4,7 +4,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { db, uploadsDir } from '../db.js';
-import { requireAuth } from '../auth.js';
+import { requireAuth, WRITE_ROLES } from '../auth.js';
 
 const router = Router();
 
@@ -59,7 +59,7 @@ router.get('/:id', requireAuth(), (req, res) => {
   res.json({ ok: true, service: svc });
 });
 
-router.post('/', requireAuth('admin'), (req, res) => {
+router.post('/', requireAuth(WRITE_ROLES), (req, res) => {
   const { title, description, category, price, duration_minutes } = req.body || {};
   if (!title || !title.trim()) return res.status(400).json({ ok: false, error: 'عنوان لازمه' });
   const maxOrder = db.prepare('SELECT COALESCE(MAX(sort_order), -1) AS m FROM services').get().m;
@@ -73,7 +73,7 @@ router.post('/', requireAuth('admin'), (req, res) => {
   res.json({ ok: true, id: Number(info.lastInsertRowid), service: fullService(Number(info.lastInsertRowid)) });
 });
 
-router.put('/:id', requireAuth('admin'), (req, res) => {
+router.put('/:id', requireAuth(WRITE_ROLES), (req, res) => {
   const id = Number(req.params.id);
   const existing = db.prepare('SELECT id FROM services WHERE id = ?').get(id);
   if (!existing) return res.status(404).json({ ok: false, error: 'خدمت پیدا نشد' });
@@ -112,7 +112,7 @@ router.delete('/:id', requireAuth('admin'), (req, res) => {
 });
 
 // ===== variantها — کلِ لیست جایگزین می‌شه (ساده‌ترین راهِ همگام‌سازی از فرم) =====
-router.put('/:id/variants', requireAuth('admin'), (req, res) => {
+router.put('/:id/variants', requireAuth(WRITE_ROLES), (req, res) => {
   const id = Number(req.params.id);
   const existing = db.prepare('SELECT id FROM services WHERE id = ?').get(id);
   if (!existing) return res.status(404).json({ ok: false, error: 'خدمت پیدا نشد' });
@@ -136,7 +136,7 @@ router.put('/:id/variants', requireAuth('admin'), (req, res) => {
 });
 
 // ===== پرسنلِ انجام‌دهنده — کلِ لیستِ id ها جایگزین می‌شه =====
-router.put('/:id/staff', requireAuth('admin'), (req, res) => {
+router.put('/:id/staff', requireAuth(WRITE_ROLES), (req, res) => {
   const id = Number(req.params.id);
   const existing = db.prepare('SELECT id FROM services WHERE id = ?').get(id);
   if (!existing) return res.status(404).json({ ok: false, error: 'خدمت پیدا نشد' });
@@ -157,7 +157,7 @@ router.put('/:id/staff', requireAuth('admin'), (req, res) => {
 });
 
 // ===== عکس‌ها =====
-router.post('/:id/images', requireAuth('admin'), upload.single('image'), (req, res) => {
+router.post('/:id/images', requireAuth(WRITE_ROLES), upload.single('image'), (req, res) => {
   const id = Number(req.params.id);
   const existing = db.prepare('SELECT id FROM services WHERE id = ?').get(id);
   if (!existing) return res.status(404).json({ ok: false, error: 'خدمت پیدا نشد' });

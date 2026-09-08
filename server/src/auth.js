@@ -70,16 +70,24 @@ export function clearSessionCookie(res) {
   res.setHeader('Set-Cookie', `${SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Expires=Thu, 01 Jan 1970 00:00:00 GMT`);
 }
 
-// ===== میدل‌ور: نیاز به لاگین (و اختیاری: نقشِ خاص) =====
+// ===== میدل‌ور: نیاز به لاگین (و اختیاری: نقش/نقش‌های مجاز) =====
+// role می‌تونه یه رشته باشه (مثلاً 'admin') یا یه آرایه (مثلاً ['admin','manager']).
+// 'admin' همیشه سوپرستِ هر نقشیه، صرف‌نظر از اینکه role چی باشه.
 export function requireAuth(role) {
   return (req, res, next) => {
     const cookies = parseCookies(req);
     const user = getSessionUser(cookies[SESSION_COOKIE]);
     if (!user) return res.status(401).json({ ok: false, error: 'لاگین لازمه' });
-    if (role && user.role !== role && user.role !== 'admin') {
-      return res.status(403).json({ ok: false, error: 'دسترسی کافی نداری' });
+    if (role) {
+      const allowed = Array.isArray(role) ? role : [role];
+      if (!allowed.includes(user.role) && user.role !== 'admin') {
+        return res.status(403).json({ ok: false, error: 'دسترسی کافی نداری' });
+      }
     }
     req.user = user;
     next();
   };
 }
+
+// نقش‌هایی که اجازه‌ی «افزودن/ویرایش» دارن (منیجر + ادمین) — برای POST/PUTِ محتوا
+export const WRITE_ROLES = ['admin', 'manager'];

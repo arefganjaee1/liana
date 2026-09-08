@@ -35,12 +35,12 @@ async function loadStaff() {
       <td style="white-space:nowrap">
         <button class="btn btn-ghost btn-sm hoursBtn">${ICON.clock}<span>ساعاتِ کاری</span></button>
         <button class="btn btn-ghost btn-sm editBtn">${ICON.edit}<span>ویرایش</span></button>
-        <button class="btn btn-danger btn-sm delBtn">${ICON.trash}<span>حذف</span></button>
+        ${CURRENT_USER.role === 'admin' ? `<button class="btn btn-danger btn-sm delBtn">${ICON.trash}<span>حذف</span></button>` : ''}
       </td>
     `;
     tr.querySelector('.hoursBtn').addEventListener('click', () => openHoursModal(s));
     tr.querySelector('.editBtn').addEventListener('click', () => openStaffModal(s));
-    tr.querySelector('.delBtn').addEventListener('click', () => deleteStaff(s.id, s.name));
+    tr.querySelector('.delBtn')?.addEventListener('click', () => deleteStaff(s.id, s.name));
     tbody.appendChild(tr);
   });
 }

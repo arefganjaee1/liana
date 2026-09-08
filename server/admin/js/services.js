@@ -35,11 +35,11 @@ async function loadServices() {
       <td><span class="pill ${svc.active ? 'active' : 'inactive'}">${svc.active ? 'فعال' : 'غیرفعال'}</span></td>
       <td style="white-space:nowrap">
         <button class="btn btn-ghost btn-sm editBtn">${ICON.edit}<span>ویرایش</span></button>
-        <button class="btn btn-danger btn-sm delBtn">${ICON.trash}<span>حذف</span></button>
+        ${CURRENT_USER.role === 'admin' ? `<button class="btn btn-danger btn-sm delBtn">${ICON.trash}<span>حذف</span></button>` : ''}
       </td>
     `;
     tr.querySelector('.editBtn').addEventListener('click', () => openModal(svc.id));
-    tr.querySelector('.delBtn').addEventListener('click', () => deleteService(svc.id, svc.title));
+    tr.querySelector('.delBtn')?.addEventListener('click', () => deleteService(svc.id, svc.title));
     tbody.appendChild(tr);
   });
 }
@@ -207,9 +207,9 @@ function renderImages(images) {
     tile.innerHTML = `
       <img src="${img.url || ('/uploads/' + img.filename)}" alt="">
       <span class="tag">${IMAGE_TYPE_LABELS[img.type] || img.type}</span>
-      <button class="del-btn" title="حذف">×</button>
+      ${CURRENT_USER.role === 'admin' ? '<button class="del-btn" title="حذف">×</button>' : ''}
     `;
-    tile.querySelector('.del-btn').addEventListener('click', async () => {
+    tile.querySelector('.del-btn')?.addEventListener('click', async () => {
       try {
         await apiDelete(`/admin/services/${CURRENT_SERVICE.id}/images/${img.id}`);
         const { service } = await apiGet(`/admin/services/${CURRENT_SERVICE.id}`);

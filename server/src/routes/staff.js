@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { db } from '../db.js';
-import { requireAuth } from '../auth.js';
+import { requireAuth, WRITE_ROLES } from '../auth.js';
 
 const router = Router();
 
@@ -21,7 +21,7 @@ router.get('/', requireAuth(), (req, res) => {
   res.json({ ok: true, staff: withHours });
 });
 
-router.post('/', requireAuth('admin'), (req, res) => {
+router.post('/', requireAuth(WRITE_ROLES), (req, res) => {
   const { name, role } = req.body || {};
   if (!name || !name.trim()) return res.status(400).json({ ok: false, error: 'اسم لازمه' });
   const maxOrder = db.prepare('SELECT COALESCE(MAX(sort_order), -1) AS m FROM staff').get().m;
@@ -30,7 +30,7 @@ router.post('/', requireAuth('admin'), (req, res) => {
   res.json({ ok: true, id: Number(info.lastInsertRowid) });
 });
 
-router.put('/:id', requireAuth('admin'), (req, res) => {
+router.put('/:id', requireAuth(WRITE_ROLES), (req, res) => {
   const id = Number(req.params.id);
   const existing = db.prepare('SELECT id FROM staff WHERE id = ?').get(id);
   if (!existing) return res.status(404).json({ ok: false, error: 'پرسنل پیدا نشد' });
@@ -47,7 +47,7 @@ router.delete('/:id', requireAuth('admin'), (req, res) => {
 });
 
 // ساعاتِ هفتگیِ یه پرسنل — آرایه‌ای از ۷ روز، هرکدوم {weekday, is_off, start_time, end_time}
-router.put('/:id/hours', requireAuth('admin'), (req, res) => {
+router.put('/:id/hours', requireAuth(WRITE_ROLES), (req, res) => {
   const id = Number(req.params.id);
   const existing = db.prepare('SELECT id FROM staff WHERE id = ?').get(id);
   if (!existing) return res.status(404).json({ ok: false, error: 'پرسنل پیدا نشد' });
