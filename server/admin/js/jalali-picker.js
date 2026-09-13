@@ -3,7 +3,9 @@
 // attach(displayInput, hiddenInput): displayInput یه اینپوتِ متنیِ readonly که با کلیک باز می‌شه و متنِ شمسی نشون می‌ده؛
 // hiddenInput مقدارِ واقعیِ میلادیِ 'YYYY-MM-DD' رو نگه می‌داره (همون چیزی که فرم/سرور می‌خواد).
 (function (global) {
-  function attach(displayInput, hiddenInput) {
+  function attach(displayInput, hiddenInput, opts) {
+    opts = opts || {};
+    const allowClear = opts.allowClear !== false;
     const wrap = displayInput.closest('.jpicker') || displayInput.parentElement;
     let popup = null;
     let viewJy, viewJm;
@@ -75,7 +77,7 @@
         <div class="jpicker-days">${dayCells}</div>
         <div class="jpicker-footer">
           <button type="button" data-action="today">امروز</button>
-          <button type="button" data-action="clear">پاک‌کردن</button>
+          ${allowClear ? '<button type="button" data-action="clear">پاک‌کردن</button>' : ''}
         </div>
       `;
 
@@ -90,7 +92,9 @@
         const t = LianaJalali.todayJalali();
         selectDay(t.jy, t.jm, t.jd);
       });
-      popup.querySelector('[data-action="clear"]').addEventListener('click', clearValue);
+      if (allowClear) {
+        popup.querySelector('[data-action="clear"]').addEventListener('click', clearValue);
+      }
     }
 
     function onOutside(e) {

@@ -16,8 +16,10 @@ async function init() {
   ALL_SERVICES = (await apiGet('/admin/services')).services;
   ALL_STAFF = (await apiGet('/admin/staff')).staff;
 
+  LianaJalaliPicker.attach(document.getElementById('dateJumpDisplay'), document.getElementById('dateJumpInput'), { allowClear: false });
+
   VIEW_DATE = LianaJalali.todayISO();
-  document.getElementById('dateJumpInput').value = VIEW_DATE;
+  setDateJumpValue(VIEW_DATE);
   updateDateEcho();
 
   await loadBookings();
@@ -26,14 +28,12 @@ async function init() {
   document.getElementById('closeBookingModalBtn').addEventListener('click', closeModal);
   document.getElementById('saveBookingBtn').addEventListener('click', saveBooking);
   document.getElementById('b_service').addEventListener('change', onServiceSelectChange);
-  document.getElementById('b_date').addEventListener('input', () => {
-    document.getElementById('b_date_echo').textContent = LianaJalali.isoToJalaliDisplay(document.getElementById('b_date').value);
-  });
+  LianaJalaliPicker.attach(document.getElementById('b_date_display'), document.getElementById('b_date'));
 
   document.getElementById('todayBtn').addEventListener('click', () => {
     VIEW_MODE = 'day';
     VIEW_DATE = LianaJalali.todayISO();
-    document.getElementById('dateJumpInput').value = VIEW_DATE;
+    setDateJumpValue(VIEW_DATE);
     updateDateEcho();
     syncToolbarButtons();
     loadBookings();
@@ -53,6 +53,11 @@ async function init() {
   });
 
   syncToolbarButtons();
+}
+
+function setDateJumpValue(iso) {
+  document.getElementById('dateJumpInput').value = iso;
+  document.getElementById('dateJumpDisplay').value = iso ? LianaJalali.isoToJalaliDisplay(iso) : '';
 }
 
 function syncToolbarButtons() {
@@ -181,7 +186,7 @@ function openModal(b) {
   document.getElementById('b_phone').value = b?.customer_phone || '';
   document.getElementById('b_service_free').value = b && !b.service_id ? (b.service_title || '') : '';
   document.getElementById('b_date').value = b?.booking_date || (VIEW_MODE === 'day' ? VIEW_DATE : LianaJalali.todayISO());
-  document.getElementById('b_date_echo').textContent = LianaJalali.isoToJalaliDisplay(document.getElementById('b_date').value);
+  document.getElementById('b_date_display').value = LianaJalali.isoToJalaliDisplay(document.getElementById('b_date').value);
   document.getElementById('b_time').value = b?.booking_time || '';
   document.getElementById('b_status').value = b?.status || 'confirmed';
   document.getElementById('b_note').value = b?.note || '';

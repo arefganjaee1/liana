@@ -41,7 +41,10 @@
         <button class="btn btn-ghost btn-sm tap" id="todayBtn">امروز</button>
         <button class="btn btn-ghost btn-sm tap" id="allBtn">همه‌ی نوبت‌ها</button>
         <div class="date-jump">
-          <input type="date" id="dateJumpInput">
+          <div class="jpicker" id="dateJumpWrap">
+            <input type="text" id="dateJumpDisplay" class="jpicker-input" readonly autocomplete="off" placeholder="انتخاب تاریخ">
+            <input type="hidden" id="dateJumpInput">
+          </div>
           <span class="jalali-echo" id="dateJumpEcho"></span>
         </div>
         <div class="spacer"></div>
@@ -104,8 +107,10 @@
     <div class="row-3">
       <div class="field">
         <label>تاریخ</label>
-        <input type="date" id="b_date">
-        <span class="jalali-echo" id="b_date_echo"></span>
+        <div class="jpicker" id="b_date_wrap">
+          <input type="text" id="b_date_display" class="jpicker-input" readonly autocomplete="off" placeholder="انتخاب تاریخ">
+          <input type="hidden" id="b_date">
+        </div>
       </div>
       <div class="field">
         <label>ساعت</label>
@@ -136,6 +141,7 @@
 
 <script src="js/api.js"></script>
 <script src="js/jalali.js"></script>
+<script src="js/jalali-picker.js"></script>
 <script src="js/bookings.js"></script>
 </body>
 </html>

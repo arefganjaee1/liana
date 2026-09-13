@@ -217,6 +217,8 @@ textarea { resize: vertical; min-height: 70px; font-family: inherit; }
 .bookings-toolbar .date-jump { display: flex; align-items: center; gap: 8px; background: var(--cream); border: 1px solid var(--line); border-radius: 999px; padding: 5px 6px 5px 14px; }
 .bookings-toolbar .date-jump input[type=date] { width: 150px; border: none; background: transparent; padding: 4px 2px; }
 .bookings-toolbar .date-jump input[type=date]:focus { outline: none; }
+.bookings-toolbar .date-jump .jpicker-input { width: 130px; border: none; background: transparent; padding: 4px 2px; }
+.bookings-toolbar .date-jump .jpicker-input:focus { outline: none; }
 .bookings-toolbar .jalali-echo { font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .bookings-toolbar .spacer { flex: 1; }
 .bookings-toolbar .btn.active-filter { background: var(--accent); color: var(--accent-ink); }
