@@ -115,6 +115,9 @@ button { font-family: inherit; cursor: pointer; }
 .pill.st-confirmed { background: var(--ok-bg); color: var(--ok); }
 .pill.st-done { background: var(--cream-2); color: var(--ink-2); }
 .pill.st-cancelled { background: var(--danger-bg); color: var(--danger); }
+.pill.pc-yes { background: var(--ok-bg); color: var(--ok); }
+.pill.pc-no { background: var(--danger-bg); color: var(--danger); }
+.pill.pc-unknown { background: var(--cream-2); color: var(--ink-3); }
 
 .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
 .field label { font-size: 12px; font-weight: 700; color: var(--ink-2); }
@@ -222,3 +225,5 @@ textarea { resize: vertical; min-height: 70px; font-family: inherit; }
 .dt-cell .d { font-weight: 700; }
 .dt-cell .t { font-size: 11.5px; color: var(--ink-3); margin-top: 2px; font-variant-numeric: tabular-nums; }
 .status-select { font-size: 11px; font-weight: 700; padding: 5px 8px; border-radius: 999px; width: auto; border: 1px solid var(--line); }
+.customer-link { color: var(--accent-strong); cursor: pointer; }
+.customer-link:hover { text-decoration: underline; }

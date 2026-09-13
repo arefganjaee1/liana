@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { db } from '../db.js';
 import { requireAuth, WRITE_ROLES } from '../auth.js';
+import { normalizePhone } from '../phone.js';
 
 const router = Router();
 
@@ -8,6 +9,17 @@ const STATUSES = ['pending', 'confirmed', 'done', 'cancelled'];
 
 function fullBooking(id) {
   return db.prepare('SELECT * FROM bookings WHERE id = ?').get(id);
+}
+
+// اگه نوبت شماره‌تلفن داره، خودکار به یه پروفایلِ CRM وصلش کن — اگه مشتری با این تلفن از قبل هست همونو برگردون،
+// وگرنه یه پروفایلِ جدید (فقط با اسم/تلفن) بساز. بدونِ تلفن، نوبت به هیچ پروفایلی وصل نمی‌شه (ناشناس می‌مونه).
+function resolveCustomerId(phoneRaw, name) {
+  const phone = normalizePhone(phoneRaw);
+  if (!phone) return null;
+  const existing = db.prepare('SELECT id FROM customers WHERE phone = ?').get(phone);
+  if (existing) return existing.id;
+  const info = db.prepare('INSERT INTO customers (name, phone) VALUES (?, ?)').run(name, phone);
+  return Number(info.lastInsertRowid);
 }
 
 // لیست — با فیلترِ اختیاریِ یه روزِ خاص (?date=YYYY-MM-DD) یا یه بازه (?from=&to=)؛ بدونِ فیلتر یعنی همه، جدیدترین اول
@@ -63,13 +75,17 @@ router.post('/', requireAuth(WRITE_ROLES), (req, res) => {
   }
 
   const st = STATUSES.includes(status) ? status : 'confirmed';
+  const finalName = customer_name.trim();
+  const finalPhone = customer_phone && customer_phone.trim() ? customer_phone.trim() : null;
+  const customerId = resolveCustomerId(finalPhone, finalName);
 
   const info = db.prepare(`
-    INSERT INTO bookings (customer_name, customer_phone, service_id, service_title, staff_id, staff_name, booking_date, booking_time, status, note, created_by)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO bookings (customer_name, customer_phone, customer_id, service_id, service_title, staff_id, staff_name, booking_date, booking_time, status, note, created_by)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
-    customer_name.trim(),
-    customer_phone && customer_phone.trim() ? customer_phone.trim() : null,
+    finalName,
+    finalPhone,
+    customerId,
     svcId, svcTitle, stfId, staffName,
     booking_date,
     booking_time && booking_time.trim() ? booking_time.trim() : null,
@@ -123,14 +139,21 @@ router.put('/:id', requireAuth(WRITE_ROLES), (req, res) => {
 
   const st = status !== undefined && STATUSES.includes(status) ? status : existing.status;
 
+  const finalName = customer_name !== undefined && customer_name.trim() ? customer_name.trim() : existing.customer_name;
+  const finalPhone = customer_phone !== undefined
+    ? (customer_phone && customer_phone.trim() ? customer_phone.trim() : null)
+    : existing.customer_phone;
+  const customerId = resolveCustomerId(finalPhone, finalName);
+
   db.prepare(`
     UPDATE bookings SET
-      customer_name = ?, customer_phone = ?, service_id = ?, service_title = ?, staff_id = ?, staff_name = ?,
+      customer_name = ?, customer_phone = ?, customer_id = ?, service_id = ?, service_title = ?, staff_id = ?, staff_name = ?,
       booking_date = ?, booking_time = ?, status = ?, note = ?, updated_at = datetime('now')
     WHERE id = ?
   `).run(
-    customer_name !== undefined && customer_name.trim() ? customer_name.trim() : existing.customer_name,
-    customer_phone !== undefined ? (customer_phone && customer_phone.trim() ? customer_phone.trim() : null) : existing.customer_phone,
+    finalName,
+    finalPhone,
+    customerId,
     svcId, svcTitle, stfId, staffName,
     booking_date !== undefined ? booking_date : existing.booking_date,
     booking_time !== undefined ? (booking_time && booking_time.trim() ? booking_time.trim() : null) : existing.booking_time,

@@ -89,11 +89,29 @@ db.exec(`
     PRIMARY KEY (service_id, staff_id)
   );
 
+  -- مشتری‌ها (CRM — پروفایلِ ماندگارِ هر مشتری، جدا از رکوردِ لحظه‌ایِ هر نوبت)
+  CREATE TABLE IF NOT EXISTS customers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    phone TEXT,                                -- کلیدِ تطبیق؛ یکتا وقتی خالی نیست (ایندکسِ پارشیالِ زیر)
+    birthday TEXT,                              -- 'YYYY-MM-DD' میلادی (فرانت شمسی نمایش می‌ده)
+    address TEXT,
+    referral_source TEXT,                       -- نحوه‌ی آشنایی (اینستاگرام/معرفیِ دوستان/گوگل/تابلو/سایر)
+    allergies_notes TEXT,                       -- حساسیت/آلرژی
+    medical_notes TEXT,                         -- یادداشتِ پزشکی/موانع (بارداری، داروی رقیق‌کننده‌ی خون، و…)
+    photo_consent TEXT NOT NULL DEFAULT 'not_asked', -- 'yes' | 'no' | 'not_asked'
+    notes TEXT,                                 -- یادداشتِ عمومیِ آزاد
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE UNIQUE INDEX IF NOT EXISTS idx_customers_phone ON customers(phone) WHERE phone IS NOT NULL;
+
   -- نوبت‌ها (دفترچه‌ی رزرو دستیِ پذیرش — رزروِ واقعی هنوز از طریقِ پیامک میاد، پذیرش همینجا ثبتش می‌کنه)
   CREATE TABLE IF NOT EXISTS bookings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     customer_name TEXT NOT NULL,
     customer_phone TEXT,
+    customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL, -- لینکِ خودکار به پروفایلِ CRM (اگه تلفن داده بشه)
     service_id INTEGER REFERENCES services(id) ON DELETE SET NULL,
     service_title TEXT NOT NULL,               -- عنوانِ خدمت لحظه‌ی ثبت؛ حتی اگه بعداً خدمت عوض/حذف بشه تاریخچه درست می‌مونه
     staff_id INTEGER REFERENCES staff(id) ON DELETE SET NULL,
@@ -128,11 +146,19 @@ db.exec(`
   );
 `);
 
+// مایگریشنِ دستیِ ستونِ جدید رو دیتابیس‌های قدیمی‌تر — CREATE TABLE IF NOT EXISTS ستونِ جدید به جدولِ ازقبل‌موجود اضافه نمی‌کنه
+const bookingsCols = db.prepare("PRAGMA table_info(bookings)").all().map((c) => c.name);
+if (!bookingsCols.includes('customer_id')) {
+  db.exec(`ALTER TABLE bookings ADD COLUMN customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL;`);
+}
+db.exec(`CREATE INDEX IF NOT EXISTS idx_bookings_customer ON bookings(customer_id);`);
+
+const SCHEMA_VERSION = '2';
 const row = db.prepare('SELECT value FROM _meta WHERE key = ?').get('schema_version');
 if (!row) {
-  db.prepare('INSERT INTO _meta (key, value) VALUES (?, ?)').run('schema_version', '1');
-} else if (row.value !== '1') {
-  db.prepare('UPDATE _meta SET value = ? WHERE key = ?').run('1', 'schema_version');
+  db.prepare('INSERT INTO _meta (key, value) VALUES (?, ?)').run('schema_version', SCHEMA_VERSION);
+} else if (row.value !== SCHEMA_VERSION) {
+  db.prepare('UPDATE _meta SET value = ? WHERE key = ?').run(SCHEMA_VERSION, 'schema_version');
 }
 
 // اگه هنوز هیچ پرسنلی نیست، دکتر فرناز رو به‌عنوانِ صاحب/پرسنلِ اول می‌سازیم

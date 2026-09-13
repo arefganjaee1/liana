@@ -86,7 +86,9 @@ async function loadBookings() {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td style="color:var(--ink-3); font-variant-numeric:tabular-nums">${i + 1}</td>
-      <td class="customer-cell"><strong>${escapeHtml(b.customer_name)}</strong>${b.customer_phone ? `<span>${escapeHtml(b.customer_phone)}</span>` : ''}</td>
+      <td class="customer-cell">${b.customer_id
+        ? `<strong class="customer-link" data-customer-id="${b.customer_id}">${escapeHtml(b.customer_name)}</strong>`
+        : `<strong>${escapeHtml(b.customer_name)}</strong>`}${b.customer_phone ? `<span>${escapeHtml(b.customer_phone)}</span>` : ''}</td>
       <td>${escapeHtml(b.service_title)}${b.staff_name ? '' : ''}</td>
       <td>${b.staff_name ? escapeHtml(b.staff_name) : '—'}</td>
       <td class="dt-cell"><span class="d">${LianaJalali.isoToJalaliDisplay(b.booking_date)}</span>${b.booking_time ? `<span class="t">${LianaJalali.faDigits(b.booking_time)}</span>` : ''}</td>
@@ -117,6 +119,9 @@ async function loadBookings() {
 
     tr.querySelector('.editBtn').addEventListener('click', () => openModal(b));
     tr.querySelector('.delBtn')?.addEventListener('click', () => deleteBooking(b.id, b.customer_name));
+    tr.querySelector('.customer-link')?.addEventListener('click', () => {
+      window.location.href = `/admin/customers.html?id=${b.customer_id}`;
+    });
     tbody.appendChild(tr);
   });
 }
