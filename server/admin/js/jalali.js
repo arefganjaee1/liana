@@ -102,6 +102,45 @@
     return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
   }
 
+  // ============ افزوده‌شده برایِ پیکرِ تقویمِ پاپ‌آپ (تأیید شده رو ۱۵۱ سالِ ۱۳۰۰-۱۴۵۰ + چند موردِ خاص، مقابلِ jdatetime) ============
+
+  // سالِ جلالیِ کبیسه‌ست یا نه — بدونِ دست‌زدن به الگوریتمِ داخلی، فقط با round-trip
+  function isLeapYear(jy) {
+    var g = toGregorian(jy, 12, 30);
+    var j = toJalali(g.gy, g.gm, g.gd);
+    return j.jy === jy && j.jm === 12 && j.jd === 30;
+  }
+
+  // تعدادِ روزهایِ یه ماهِ جلالی
+  function daysInMonth(jy, jm) {
+    if (jm <= 6) return 31;
+    if (jm <= 11) return 30;
+    return isLeapYear(jy) ? 30 : 29;
+  }
+
+  function todayJalali() {
+    var iso = todayISO();
+    var p = iso.split('-').map(Number);
+    return toJalali(p[0], p[1], p[2]);
+  }
+
+  // {jy,jm,jd} جلالی → 'YYYY-MM-DD' میلادی
+  function jalaliToISO(jy, jm, jd) {
+    var g = toGregorian(jy, jm, jd);
+    return g.gy + '-' + pad2(g.gm) + '-' + pad2(g.gd);
+  }
+
+  // شماره‌ی ستونِ اولین روزِ ماه تو گریدِ تقویم — 0=شنبه ... 6=جمعه
+  function firstWeekdayIndex(jy, jm) {
+    var g = toGregorian(jy, jm, 1);
+    var jdn = g2d(g.gy, g.gm, g.gd);
+    var m = mod(jdn, 7); // 0=دوشنبه ... 4=جمعه, 5=شنبه, 6=یکشنبه (هم‌راستا با weekdayFromISO)
+    return mod(m + 2, 7); // 0=شنبه ... 6=جمعه
+  }
+
+  var MONTH_NAMES = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
+  var WEEKDAY_SHORT = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج']; // شروع از شنبه
+
   global.LianaJalali = {
     toJalali: toJalali,
     toGregorian: toGregorian,
@@ -109,5 +148,12 @@
     weekdayFromISO: weekdayFromISO,
     isoToJalaliDisplay: isoToJalaliDisplay,
     todayISO: todayISO,
+    isLeapYear: isLeapYear,
+    daysInMonth: daysInMonth,
+    todayJalali: todayJalali,
+    jalaliToISO: jalaliToISO,
+    firstWeekdayIndex: firstWeekdayIndex,
+    MONTH_NAMES: MONTH_NAMES,
+    WEEKDAY_SHORT: WEEKDAY_SHORT,
   };
 })(window);

@@ -227,3 +227,39 @@ textarea { resize: vertical; min-height: 70px; font-family: inherit; }
 .status-select { font-size: 11px; font-weight: 700; padding: 5px 8px; border-radius: 999px; width: auto; border: 1px solid var(--line); }
 .customer-link { color: var(--accent-strong); cursor: pointer; }
 .customer-link:hover { text-decoration: underline; }
+
+/* ============ پیکرِ تقویمِ شمسیِ اختصاصی ============ */
+.jpicker { position: relative; }
+.jpicker-input { cursor: pointer; background-image: none; }
+.jpicker-input::placeholder { color: var(--ink-3); }
+.jpicker-popup {
+  position: absolute; top: calc(100% + 6px); right: 0; z-index: 60; width: 280px;
+  background: var(--cream); border: 1px solid var(--line); border-radius: var(--radius-md); box-shadow: var(--shadow-2);
+  padding: 12px; animation: jpickerIn .12s ease;
+}
+@keyframes jpickerIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+.jpicker-head { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+.jpicker-nav {
+  width: 26px; height: 26px; flex-shrink: 0; border-radius: 999px; border: 1px solid var(--line); background: var(--cream);
+  display: flex; align-items: center; justify-content: center; color: var(--ink-2);
+}
+.jpicker-nav:hover { background: var(--sand); }
+.jpicker-nav svg { width: 13px; height: 13px; }
+.jpicker-head select {
+  font-size: 12.5px; font-weight: 700; padding: 5px 6px; width: auto; flex: 1; border-radius: var(--radius-sm);
+}
+.jpicker-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 4px; }
+.jpicker-weekdays span { text-align: center; font-size: 10.5px; font-weight: 700; color: var(--ink-3); padding: 4px 0; }
+.jpicker-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.jpicker-day {
+  aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; font-variant-numeric: tabular-nums;
+  border-radius: var(--radius-sm); border: none; background: transparent; color: var(--ink); cursor: pointer;
+}
+.jpicker-day:hover { background: var(--cream-2); }
+.jpicker-day.is-empty { visibility: hidden; pointer-events: none; }
+.jpicker-day.is-today { color: var(--accent-strong); font-weight: 800; box-shadow: inset 0 0 0 1.5px var(--accent-light); }
+.jpicker-day.is-selected { background: var(--accent); color: var(--accent-ink); font-weight: 800; }
+.jpicker-day.is-selected:hover { background: var(--accent-strong); }
+.jpicker-footer { display: flex; justify-content: space-between; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--line); }
+.jpicker-footer button { font-size: 11.5px; font-weight: 700; color: var(--accent-strong); background: none; border: none; padding: 4px 6px; }
+.jpicker-footer button:hover { text-decoration: underline; }

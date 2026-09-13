@@ -17,9 +17,7 @@ async function init() {
   document.getElementById('closeCustomerModalBtn').addEventListener('click', closeModal);
   document.getElementById('saveCustomerBtn').addEventListener('click', saveCustomer);
   document.getElementById('c_referral').addEventListener('change', onReferralChange);
-  document.getElementById('c_birthday').addEventListener('input', () => {
-    document.getElementById('c_birthday_echo').textContent = LianaJalali.isoToJalaliDisplay(document.getElementById('c_birthday').value);
-  });
+  LianaJalaliPicker.attach(document.getElementById('c_birthday_display'), document.getElementById('c_birthday'));
   document.getElementById('searchInput').addEventListener('input', (e) => {
     clearTimeout(SEARCH_TIMER);
     const val = e.target.value;
@@ -123,7 +121,7 @@ function openModal(c) {
   document.getElementById('c_name').value = c?.name || '';
   document.getElementById('c_phone').value = c?.phone || '';
   document.getElementById('c_birthday').value = c?.birthday || '';
-  document.getElementById('c_birthday_echo').textContent = c?.birthday ? LianaJalali.isoToJalaliDisplay(c.birthday) : '';
+  document.getElementById('c_birthday_display').value = c?.birthday ? LianaJalali.isoToJalaliDisplay(c.birthday) : '';
   document.getElementById('c_address').value = c?.address || '';
   document.getElementById('c_allergies').value = c?.allergies_notes || '';
   document.getElementById('c_medical').value = c?.medical_notes || '';
