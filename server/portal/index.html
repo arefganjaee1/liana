@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>پروفایلِ من | کلینیک لیانا</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/portal.css">
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">
+      <span class="mark"><img src="assets/logo.png" alt="لیانا"></span>
+      <span class="name">کلینیک لیانا</span>
+    </div>
+
+    <div class="profile-header">
+      <span class="hello">سلام، <strong id="customerName">…</strong></span>
+      <button class="logout-link" id="logoutBtn">خروج</button>
+    </div>
+
+    <div class="points-card">
+      <div class="num" id="pointsNum">۰</div>
+      <div class="label">امتیازِ باشگاهِ مشتریان (به‌ازایِ هر مراجعه)</div>
+    </div>
+
+    <p class="section-title">تاریخچه‌ی نوبت‌ها</p>
+    <div class="history" id="historyList"></div>
+    <p class="empty" id="emptyState" hidden>هنوز نوبتی برایِ شما ثبت نشده.</p>
+  </div>
+
+  <script src="js/jalali.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/profile.js"></script>
+</body>
+</html>

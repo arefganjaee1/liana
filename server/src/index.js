@@ -11,6 +11,7 @@ import servicesRoutes from './routes/services.js';
 import bookingsRoutes from './routes/bookings.js';
 import customersRoutes from './routes/customers.js';
 import publicRoutes from './routes/public.js';
+import customerAuthRoutes from './routes/customerAuth.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -34,12 +35,16 @@ app.use('/api/admin/services', servicesRoutes);
 app.use('/api/admin/bookings', bookingsRoutes);
 app.use('/api/admin/customers', customersRoutes);
 app.use('/api/public', publicRoutes);
+app.use('/api/customer/auth', customerAuthRoutes);
 
 // عکس‌های آپلودشده — استاتیک
 app.use('/uploads', express.static(uploadsDir));
 
 // خودِ پنلِ مدیریت — یه فرانتِ استاتیکِ ساده، پشتِ همین سرور
 app.use('/admin', express.static(path.join(__dirname, '..', 'admin')));
+
+// پورتالِ مشتری (ورود با تلفن+کد، نمایشِ امتیاز/تاریخچه) — فرانتِ استاتیکِ جدا، پشتِ همین سرور
+app.use('/portal', express.static(path.join(__dirname, '..', 'portal')));
 
 // آدرسِ ریشه — فعلاً سایتِ اصلی این‌جا نیست، پس مستقیم به لاگینِ پنل هدایت کن
 app.get('/', (req, res) => res.redirect('/admin/login.html'));

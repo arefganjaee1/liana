@@ -144,6 +144,23 @@ db.exec(`
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     expires_at TEXT NOT NULL
   );
+
+  -- کدهای یک‌بارمصرفِ ورودِ مشتری (پورتالِ مشتری) — به‌ازایِ هر تلفن فقط یه کدِ فعال
+  CREATE TABLE IF NOT EXISTS customer_otps (
+    phone TEXT PRIMARY KEY,
+    code_hash TEXT NOT NULL,
+    attempts INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    expires_at TEXT NOT NULL
+  );
+
+  -- سشنِ ورودِ پورتالِ مشتری — جدا از سشنِ پنلِ ادمین/پرسنل
+  CREATE TABLE IF NOT EXISTS customer_sessions (
+    token TEXT PRIMARY KEY,
+    customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    expires_at TEXT NOT NULL
+  );
 `);
 
 // مایگریشنِ دستیِ ستونِ جدید رو دیتابیس‌های قدیمی‌تر — CREATE TABLE IF NOT EXISTS ستونِ جدید به جدولِ ازقبل‌موجود اضافه نمی‌کنه
@@ -153,7 +170,7 @@ if (!bookingsCols.includes('customer_id')) {
 }
 db.exec(`CREATE INDEX IF NOT EXISTS idx_bookings_customer ON bookings(customer_id);`);
 
-const SCHEMA_VERSION = '2';
+const SCHEMA_VERSION = '3';
 const row = db.prepare('SELECT value FROM _meta WHERE key = ?').get('schema_version');
 if (!row) {
   db.prepare('INSERT INTO _meta (key, value) VALUES (?, ?)').run('schema_version', SCHEMA_VERSION);

@@ -91,3 +91,52 @@ export function requireAuth(role) {
 
 // نقش‌هایی که اجازه‌ی «افزودن/ویرایش» دارن (منیجر + ادمین) — برای POST/PUTِ محتوا
 export const WRITE_ROLES = ['admin', 'manager'];
+
+// ===== سشنِ پورتالِ مشتری — کاملاً جدا از سشنِ پنلِ ادمین/پرسنل (کوکی/جدولِ جدا) =====
+const CUSTOMER_SESSION_DAYS = 30;
+export const CUSTOMER_SESSION_COOKIE = 'liana_customer_session';
+
+export function createCustomerSession(customerId) {
+  const token = crypto.randomBytes(32).toString('hex');
+  const expires = new Date(Date.now() + CUSTOMER_SESSION_DAYS * 24 * 3600 * 1000).toISOString();
+  db.prepare('INSERT INTO customer_sessions (token, customer_id, expires_at) VALUES (?, ?, ?)').run(token, customerId, expires);
+  return { token, expires };
+}
+
+export function destroyCustomerSession(token) {
+  db.prepare('DELETE FROM customer_sessions WHERE token = ?').run(token);
+}
+
+export function getSessionCustomer(token) {
+  if (!token) return null;
+  const session = db.prepare('SELECT * FROM customer_sessions WHERE token = ?').get(token);
+  if (!session) return null;
+  if (new Date(session.expires_at).getTime() < Date.now()) {
+    destroyCustomerSession(token);
+    return null;
+  }
+  const customer = db.prepare('SELECT * FROM customers WHERE id = ?').get(session.customer_id);
+  if (!customer) return null;
+  return customer;
+}
+
+export function setCustomerSessionCookie(res, token, expiresISO) {
+  const expires = new Date(expiresISO).toUTCString();
+  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
+  res.setHeader('Set-Cookie', `${CUSTOMER_SESSION_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Lax; Expires=${expires}${secure}`);
+}
+
+export function clearCustomerSessionCookie(res) {
+  res.setHeader('Set-Cookie', `${CUSTOMER_SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Expires=Thu, 01 Jan 1970 00:00:00 GMT`);
+}
+
+// میدل‌ور: نیاز به لاگین‌بودنِ مشتری تو پورتال
+export function requireCustomerAuth() {
+  return (req, res, next) => {
+    const cookies = parseCookies(req);
+    const customer = getSessionCustomer(cookies[CUSTOMER_SESSION_COOKIE]);
+    if (!customer) return res.status(401).json({ ok: false, error: 'لاگین لازمه' });
+    req.customer = customer;
+    next();
+  };
+}

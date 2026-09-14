@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ورود به حساب | کلینیک لیانا</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/portal.css">
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">
+      <span class="mark"><img src="assets/logo.png" alt="لیانا"></span>
+      <span class="name">کلینیک لیانا</span>
+    </div>
+
+    <div class="card">
+      <p class="eyebrow-label">پروفایلِ مشتری</p>
+      <h1 id="stepTitle">ورود با شماره‌ی تلفن</h1>
+      <p class="sub" id="stepSub">همون شماره‌ای که موقعِ نوبت‌گیری دادی رو وارد کن تا کدِ ورود برات پیامک بشه.</p>
+
+      <div class="msg" id="msgBox"></div>
+
+      <div id="stepPhone">
+        <div class="field">
+          <label>شماره‌ی موبایل</label>
+          <input type="tel" id="phoneInput" inputmode="numeric" placeholder="09xxxxxxxxx" autocomplete="tel" dir="ltr">
+        </div>
+        <button class="btn" id="sendCodeBtn">دریافتِ کد</button>
+      </div>
+
+      <div id="stepCode" hidden>
+        <div class="field">
+          <label>کدِ پیامک‌شده</label>
+          <input type="text" id="codeInput" inputmode="numeric" maxlength="5" placeholder="•••••" autocomplete="one-time-code" dir="ltr">
+        </div>
+        <button class="btn" id="verifyBtn">تأیید و ورود</button>
+        <button class="btn ghost" id="backBtn">تغییرِ شماره</button>
+        <p class="hint">کد نیومد؟ <button id="resendBtn">دوباره ارسال کن</button></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>
