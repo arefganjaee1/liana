@@ -97,9 +97,9 @@ h1 { font-size: 20px; margin: 0 0 6px; }
 .field input:focus { outline: none; border-color: var(--accent); }
 
 .btn {
-  width: 100%; padding: 13px; border: none; border-radius: 999px;
+  display: block; width: 100%; padding: 13px; border: none; border-radius: 999px;
   background: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 14.5px;
-  transition: transform .12s ease;
+  text-align: center; transition: transform .12s ease;
 }
 .btn:active { transform: scale(.96); }
 .btn:disabled { opacity: .55; cursor: not-allowed; }
@@ -155,3 +155,12 @@ h1 { font-size: 20px; margin: 0 0 6px; }
 .pill.cancelled { background: var(--cancelled-bg); color: var(--cancelled-ink); }
 
 .empty { text-align: center; color: var(--ink-3); font-size: 13.5px; padding: 30px 10px; }
+
+.portal-actions {
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.portal-actions .logout-link { background: none; }
