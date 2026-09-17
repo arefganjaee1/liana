@@ -13,7 +13,7 @@ function fullBooking(id) {
 
 // اگه نوبت شماره‌تلفن داره، خودکار به یه پروفایلِ CRM وصلش کن — اگه مشتری با این تلفن از قبل هست همونو برگردون،
 // وگرنه یه پروفایلِ جدید (فقط با اسم/تلفن) بساز. بدونِ تلفن، نوبت به هیچ پروفایلی وصل نمی‌شه (ناشناس می‌مونه).
-function resolveCustomerId(phoneRaw, name) {
+export function resolveCustomerId(phoneRaw, name) {
   const phone = normalizePhone(phoneRaw);
   if (!phone) return null;
   const existing = db.prepare('SELECT id FROM customers WHERE phone = ?').get(phone);

@@ -120,14 +120,23 @@ export function getSessionCustomer(token) {
   return customer;
 }
 
+// این کوکی باید هم رویِ panel.liana.arefprojects.ir و هم رویِ liana.arefprojects.ir (و card.liana.arefprojects.ir)
+// خونده بشه — برایِ فیچرِ «کارتِ NFC رو بزن، اگه گوشیِ خودِ مشتریه خودکار برو تو پروفایلش».
+// چون panel.liana.arefprojects.ir زیردامنه‌یِ liana.arefprojects.ir‌ـه، اجازه داره کوکی رو برایِ اون دامنه ست کنه
+// و مرورگر خودکار رویِ همه‌یِ زیردامنه‌هاش (از‌جمله خودِ panel) اعمالش می‌کنه.
+// تویِ دولوپمنتِ لوکال Domain رو خالی می‌ذاریم که کوکی host-only بمونه و رویِ localhost/IP کار کنه.
+const CUSTOMER_COOKIE_DOMAIN = process.env.NODE_ENV === 'production' ? '; Domain=liana.arefprojects.ir' : '';
+
 export function setCustomerSessionCookie(res, token, expiresISO) {
   const expires = new Date(expiresISO).toUTCString();
   const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
-  res.setHeader('Set-Cookie', `${CUSTOMER_SESSION_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Lax; Expires=${expires}${secure}`);
+  res.setHeader('Set-Cookie', `${CUSTOMER_SESSION_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Lax; Expires=${expires}${secure}${CUSTOMER_COOKIE_DOMAIN}`);
 }
 
 export function clearCustomerSessionCookie(res) {
-  res.setHeader('Set-Cookie', `${CUSTOMER_SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Expires=Thu, 01 Jan 1970 00:00:00 GMT`);
+  // نکته‌ی مهم: برایِ پاک‌کردنِ کوکی‌ای که با Domain ست شده، باید دقیقاً همون Domain رو تویِ کلیرش هم بذاریم؛
+  // وگرنه مرورگر کوکیِ اصلی رو دست‌نخورده نگه می‌داره و به‌جاش یه کوکیِ host-only خالی می‌سازه.
+  res.setHeader('Set-Cookie', `${CUSTOMER_SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Expires=Thu, 01 Jan 1970 00:00:00 GMT${CUSTOMER_COOKIE_DOMAIN}`);
 }
 
 // میدل‌ور: نیاز به لاگین‌بودنِ مشتری تو پورتال

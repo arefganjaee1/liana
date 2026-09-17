@@ -27,7 +27,7 @@
         <button class="tap" type="button" data-tab="massage">ماساژ</button>
       </div>
       <span class="nav-sep"></span>
-      <a href="sms:+989332650382" class="cta-pill tap">رزرو نوبت</a>
+      <a href="#" class="cta-pill tap" data-open="book">رزرو نوبت</a>
     </div>
     <button class="menu-btn tap" id="menuBtn" aria-label="باز کردن منو" aria-expanded="false" aria-controls="drawer">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
@@ -47,7 +47,7 @@
     <a href="#" class="tap" data-open="about">درباره‌ی ما</a>
     <a href="#contact" class="tap">تماس</a>
   </nav>
-  <a href="sms:+989332650382" class="drawer-cta tap">رزرو نوبت با پیامک</a>
+  <a href="#" class="drawer-cta tap" data-open="book">رزرو نوبت</a>
   <a href="https://instagram.com/liana._clinic" target="_blank" rel="noopener" class="drawer-insta tap">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
     Liana._clinic
@@ -110,7 +110,7 @@
       <div class="case-divider"></div>
       <div class="case-selected-title">خدماتِ این نمونه‌کار</div>
       <div class="case-chips" id="caseChips"></div>
-      <div class="case-booking"><a class="case-book tap" id="caseReserveCta" href="sms:+989332650382">رزروِ نوبت ←</a></div>
+      <div class="case-booking"><a class="case-book tap" id="caseReserveCta" href="#" data-open="book">رزروِ نوبت ←</a></div>
     </section>
   </div>
 </section>
@@ -165,6 +165,61 @@
   <div class="modal-body" id="svcModalBody"></div>
 </div>
 
+<div class="modal-backdrop" id="bookBackdrop"></div>
+<div class="modal book-modal" id="bookModal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal-body">
+    <div class="book-modal-head">
+      <h3>رزروِ نوبت</h3>
+      <button class="modal-close-plain tap" id="bookClose" aria-label="بستن" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <p class="book-modal-note">فرم رو پر کن؛ برایِ هماهنگیِ دقیقِ نوبت باهات تماس می‌گیریم.</p>
+
+    <form id="bookForm" class="book-form" novalidate>
+      <div class="book-field">
+        <label for="book_name">اسم و فامیل</label>
+        <input type="text" id="book_name" name="name" required autocomplete="name">
+      </div>
+      <div class="book-field">
+        <label for="book_phone">شماره‌ی تلفن</label>
+        <input type="tel" id="book_phone" name="phone" required inputmode="numeric" autocomplete="tel" placeholder="۰۹xxxxxxxxx">
+      </div>
+      <div class="book-field">
+        <label for="book_service">خدمتِ موردنظر</label>
+        <select id="book_service" name="service_id">
+          <option value="">هنوز مطمئن نیستم</option>
+        </select>
+      </div>
+      <div class="book-field">
+        <label for="book_when">زمانِ ترجیحی</label>
+        <select id="book_when" name="preferred_when">
+          <option value="هرچه زودتر">هرچه زودتر</option>
+          <option value="امروز">امروز</option>
+          <option value="فردا">فردا</option>
+          <option value="این هفته">این هفته</option>
+          <option value="هفته‌ی بعد">هفته‌ی بعد</option>
+          <option value="فرقی نمی‌کنه">فرقی نمی‌کنه</option>
+        </select>
+      </div>
+      <div class="book-field">
+        <label for="book_note">توضیحاتِ تکمیلی (اختیاری)</label>
+        <textarea id="book_note" name="note" rows="2" placeholder="مثلاً ساعتِ ترجیحی یا هر نکته‌ی دیگه"></textarea>
+      </div>
+      <p class="book-error" id="bookError" hidden></p>
+      <button type="submit" class="book-submit tap" id="bookSubmitBtn">ثبتِ درخواست</button>
+      <a href="sms:+989332650382" class="book-alt tap">یا مستقیم پیامک بده ←</a>
+    </form>
+
+    <div class="book-success" id="bookSuccess" hidden>
+      <div class="book-success-icon">✓</div>
+      <h3>درخواستت ثبت شد</h3>
+      <p>به‌زودی برایِ هماهنگیِ دقیقِ نوبت باهات تماس می‌گیریم.</p>
+      <button type="button" class="book-submit tap" id="bookSuccessClose">باشه</button>
+    </div>
+  </div>
+</div>
+
 <footer class="site-footer reveal-onscroll" id="contact">
   <div class="footer-inner">
     <div class="footer-grid">
@@ -174,7 +229,7 @@
           <span class="name">لیانا</span>
         </div>
         <p class="footer-tagline">کلینیک تخصصی زیبایی — با دکتر فرناز گنجایی، بهترین نسخه‌ی خودت باش.</p>
-        <a href="sms:+989332650382" class="drawer-cta tap" style="margin-top:16px; display:inline-block;">رزرو نوبت با پیامک</a>
+        <a href="#" class="drawer-cta tap" data-open="book" style="margin-top:16px; display:inline-block;">رزرو نوبت</a>
       </div>
 
       <div>
@@ -225,7 +280,7 @@
 </footer>
 
 <div class="sticky-cta-wrap">
-  <a href="sms:+989332650382" class="sticky-cta tap">رزرو نوبت</a>
+  <a href="#" class="sticky-cta tap" data-open="book">رزرو نوبت</a>
 </div>
 
 <script>
@@ -270,6 +325,94 @@
   });
   aboutClose.addEventListener('click', closeAboutModal);
   aboutBackdrop.addEventListener('click', closeAboutModal);
+
+  /* ---------- مودالِ رزروِ نوبت — درخواست می‌ره تو همون جدولِ نوبت‌هایِ پنل، با وضعیتِ «در انتظارِ تایید» ---------- */
+  const API_PANEL = 'https://panel.liana.arefprojects.ir';
+  const bookModal = document.getElementById('bookModal');
+  const bookBackdrop = document.getElementById('bookBackdrop');
+  const bookClose = document.getElementById('bookClose');
+  const bookForm = document.getElementById('bookForm');
+  const bookSuccess = document.getElementById('bookSuccess');
+  const bookError = document.getElementById('bookError');
+  const bookServiceSelect = document.getElementById('book_service');
+  const bookNoteField = document.getElementById('book_note');
+  const bookSubmitBtn = document.getElementById('bookSubmitBtn');
+
+  let bookServicesRequested = false;
+  function loadBookServices() {
+    if (bookServicesRequested) return;
+    bookServicesRequested = true;
+    fetch(API_PANEL + '/api/public/services')
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data || !data.ok || !Array.isArray(data.services)) return;
+        data.services.forEach((svc) => {
+          const opt = document.createElement('option');
+          opt.value = svc.id;
+          opt.textContent = svc.title;
+          bookServiceSelect.appendChild(opt);
+        });
+      })
+      .catch(() => { /* اگه لیستِ خدمات لود نشد، همون گزینه‌ی پیش‌فرض «هنوز مطمئن نیستم» کافیه */ });
+  }
+
+  function openBookModal(prefillNote) {
+    closeDrawer();
+    bookForm.reset();
+    bookForm.hidden = false;
+    bookSuccess.hidden = true;
+    bookError.hidden = true;
+    bookSubmitBtn.disabled = false;
+    bookSubmitBtn.textContent = 'ثبتِ درخواست';
+    loadBookServices();
+    if (prefillNote) bookNoteField.value = prefillNote;
+    bookModal.classList.add('open'); bookBackdrop.classList.add('open');
+    bookModal.setAttribute('aria-hidden', 'false');
+  }
+  function closeBookModal() {
+    bookModal.classList.remove('open'); bookBackdrop.classList.remove('open');
+    bookModal.setAttribute('aria-hidden', 'true');
+  }
+  bookClose.addEventListener('click', closeBookModal);
+  bookBackdrop.addEventListener('click', closeBookModal);
+  document.getElementById('bookSuccessClose').addEventListener('click', closeBookModal);
+
+  document.querySelectorAll('[data-open="book"]').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      openBookModal(el.dataset.bookNote || '');
+    });
+  });
+
+  bookForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    bookError.hidden = true;
+    bookSubmitBtn.disabled = true;
+    bookSubmitBtn.textContent = 'در حالِ ثبت...';
+    fetch(API_PANEL + '/api/public/booking-request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: document.getElementById('book_name').value,
+        phone: document.getElementById('book_phone').value,
+        service_id: bookServiceSelect.value || null,
+        preferred_when: document.getElementById('book_when').value,
+        note: bookNoteField.value,
+      }),
+    })
+      .then(async (r) => {
+        const data = await r.json().catch(() => ({}));
+        if (!r.ok || !data.ok) throw new Error(data.error || 'خطایی پیش اومد، دوباره امتحان کن.');
+        bookForm.hidden = true;
+        bookSuccess.hidden = false;
+      })
+      .catch((err) => {
+        bookError.textContent = err.message || 'خطایی پیش اومد، دوباره امتحان کن.';
+        bookError.hidden = false;
+        bookSubmitBtn.disabled = false;
+        bookSubmitBtn.textContent = 'ثبتِ درخواست';
+      });
+  });
 
   /* ---------- پاپ‌آپ دسته‌بندی‌ها (تزریقات/پوست/ماساژ) ---------- */
   const catModal = document.getElementById('catModal');
@@ -335,7 +478,8 @@
 
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
-    if (svcModal.classList.contains('open')) closeSvcModal();
+    if (bookModal.classList.contains('open')) closeBookModal();
+    else if (svcModal.classList.contains('open')) closeSvcModal();
     else if (catModal.classList.contains('open')) closeCatModal();
     else if (aboutModal.classList.contains('open')) closeAboutModal();
     else if (drawer.classList.contains('open')) closeDrawer();
@@ -526,27 +670,31 @@
       '<p>' + descText + '</p>' +
       factsHTML +
       variantsHTML +
-      '<a href="sms:+989332650382" class="drawer-cta tap svc-reserve-cta" id="svcReserveCta">رزرو نوبت با پیامک</a>';
+      '<button type="button" class="drawer-cta tap svc-reserve-cta" id="svcReserveCta">رزرو نوبت</button>';
 
-    function reserveText(variant) {
-      return variant ? ('سلام، می‌خوام برای «' + svc.title + ' — ' + variant + '» نوبت بگیرم.') : ('سلام، می‌خوام برای «' + svc.title + '» نوبت بگیرم.');
+    function reserveNote(variant) {
+      return 'خدمتِ موردنظر: ' + svc.title + (variant ? (' — ' + variant) : '');
     }
-    function updateReserveHref(variant) {
-      const cta = document.getElementById('svcReserveCta');
-      if (cta) cta.href = 'sms:+989332650382?body=' + encodeURIComponent(reserveText(variant));
+    let svcReserveNote = '';
+    function updateReserveNote(variant) {
+      svcReserveNote = reserveNote(variant);
     }
     if (hasVariants) {
-      updateReserveHref(svc.variants[0]);
+      updateReserveNote(svc.variants[0]);
       document.getElementById('svcVariants').addEventListener('click', (e) => {
         const btn = e.target.closest('.svc-variant-chip');
         if (!btn) return;
         document.querySelectorAll('#svcVariants .svc-variant-chip').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        updateReserveHref(btn.dataset.variant);
+        updateReserveNote(btn.dataset.variant);
       });
     } else {
-      updateReserveHref(null);
+      updateReserveNote(null);
     }
+    document.getElementById('svcReserveCta').addEventListener('click', () => {
+      closeSvcModal();
+      openBookModal(svcReserveNote);
+    });
 
     svcModal.classList.add('open'); svcBackdrop.classList.add('open');
     svcModal.setAttribute('aria-hidden', 'false');
@@ -588,7 +736,7 @@
   var caseSelected=3;
   var caseIcons=['✦','◌','♡','◷'];
 
-  function caseReserveText(p){ return 'سلام، می‌خوام برای «'+p.name+' — '+p.svc+'» نوبت بگیرم.'; }
+  function caseReserveText(p){ return 'خدمتِ موردنظر: '+p.name+' — '+p.svc; }
 
   function caseRender(){
     var p=caseData[caseSelected];
@@ -607,7 +755,7 @@
     document.getElementById('caseCounter').textContent=String(caseSelected+1).padStart(2,'0')+' / '+String(caseData.length).padStart(2,'0');
     document.querySelectorAll('.case-marker').forEach(function(m,i){ m.classList.toggle('active', i===caseSelected); });
     var cta=document.getElementById('caseReserveCta');
-    if (cta) cta.href='sms:+989332650382?body='+encodeURIComponent(caseReserveText(p));
+    if (cta) cta.dataset.bookNote=caseReserveText(p);
   }
   window.caseSelect=function(i){ caseSelected=i; caseRender(); };
   window.caseNext=function(){ caseSelected=(caseSelected+1)%caseData.length; caseRender(); };

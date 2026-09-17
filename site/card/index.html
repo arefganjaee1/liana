@@ -392,6 +392,18 @@
   </div>
 
   <script>
+    /* اگه این گوشی همونِ گوشیِ مشتریِ لاگین‌شده تو پورتاله (کوکیِ سشنِ پورتال رو داره)، خودکار می‌بریمش
+       تو پروفایلِ خودش؛ برایِ بقیه‌ی گوشی‌ها (یعنی تقریباً همیشه) این فقط یه فچِ ساکتِ پس‌زمینه‌ست و
+       هیچ چیزی رو صفحه عوض نمی‌کنه. اگه شبکه/سرور مشکل داشت هم بی‌سروصدا نادیده گرفته می‌شه. */
+    fetch('https://panel.liana.arefprojects.ir/api/customer/auth/me', { credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data && data.ok) {
+          window.location.replace('https://panel.liana.arefprojects.ir/portal/index.html');
+        }
+      })
+      .catch(() => {});
+
     function toLatinDigits(str) {
       const fa = '۰۱۲۳۴۵۶۷۸۹', ar = '٠١٢٣٤٥٦٧٨٩';
       return str.replace(/[۰-۹٠-٩]/g, (ch) => {
