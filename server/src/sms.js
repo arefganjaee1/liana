@@ -10,7 +10,8 @@ const PROVIDER = process.env.SMS_PROVIDER || 'mock';
 async function sendViaMock(phone, text) {
   // امنیتِ صریح: تو محیطِ زنده هرگز نباید بی‌صدا وانمود کنیم پیامک رفته در حالی که نرفته —
   // اگه رو VPS متغیرِ SMS_PROVIDER/کلیدِ واقعی تنظیم نشده باشه، پورتال باید صریح خطا بده، نه mock کنه.
-  if (process.env.NODE_ENV === 'production') {
+  const allowDevOtp = process.env.ALLOW_DEV_OTP === 'true';
+  if (process.env.NODE_ENV === 'production' && !allowDevOtp) {
     throw new Error('سرویسِ پیامکِ واقعی هنوز وصل نشده (SMS_PROVIDER/کلیدِ API تنظیم نشده)');
   }
   console.log(`[SMS:mock] به ${phone} → ${text}  (پیامکِ واقعی ارسال نشد — SMS_PROVIDER تنظیم نشده)`);

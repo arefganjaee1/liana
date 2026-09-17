@@ -77,7 +77,8 @@ router.post('/request-otp', async (req, res) => {
   }
 
   const info = smsProviderInfo();
-  res.json({ ok: true, ...(info.isMock && process.env.NODE_ENV !== 'production' ? { dev_code: code } : {}) });
+  const showDevCode = info.isMock && (process.env.NODE_ENV !== 'production' || process.env.ALLOW_DEV_OTP === 'true');
+  res.json({ ok: true, ...(showDevCode ? { dev_code: code } : {}) });
 });
 
 // تأییدِ کد و ساختِ سشن
