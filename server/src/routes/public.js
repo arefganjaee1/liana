@@ -2,8 +2,34 @@ import { Router } from 'express';
 import { db } from '../db.js';
 import { normalizePhone } from '../phone.js';
 import { resolveCustomerId } from './bookings.js';
+import { computeSlotsForDate, computeAvailableDaysAhead, isSlotStillAvailable, getServiceDuration } from '../availability.js';
 
 const router = Router();
+
+function loadActiveService(serviceIdRaw) {
+  const id = serviceIdRaw ? Number(serviceIdRaw) : null;
+  if (!id) return null;
+  return db.prepare('SELECT id, title, duration_minutes FROM services WHERE id = ? AND active = 1').get(id);
+}
+
+// روزهایی از n روزِ آینده که حداقل یه اسلاتِ خالی دارن — برایِ نوارِ روزهایِ تقویم
+// فازِ رزروِ آنلاین — هنوز به هیچ دکمه/صفحه‌ی رو-به-مشتری وصل نیست، فقط زیرساخته (غیرفعال طبقِ خواسته‌ی صریحِ کاربر)
+router.get('/availability/days', (req, res) => {
+  const svc = loadActiveService(req.query.service_id);
+  const duration = getServiceDuration(svc);
+  const days = computeAvailableDaysAhead(duration);
+  res.json({ ok: true, days, duration_minutes: duration });
+});
+
+// اسلاتِ خالیِ یه تاریخِ خاص — همون، هنوز غیرفعال/بدونِ لینکِ عمومی
+router.get('/availability/slots', (req, res) => {
+  const dateStr = String(req.query.date || '');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return res.status(400).json({ ok: false, error: 'تاریخ نامعتبره' });
+  const svc = loadActiveService(req.query.service_id);
+  const duration = getServiceDuration(svc);
+  const slots = computeSlotsForDate(dateStr, duration);
+  res.json({ ok: true, slots, duration_minutes: duration });
+});
 
 // فقط خدماتِ فعال، برای مصرفِ آینده‌ی سایتِ عمومی (فازِ بعدی) — فعلاً فقط برای تست/آماده‌سازی
 router.get('/services', (req, res) => {
@@ -45,21 +71,39 @@ router.post('/booking-request', (req, res) => {
   let svcId = null;
   let svcTitle = 'هنوز مشخص نشده';
   const serviceIdRaw = req.body?.service_id ? Number(req.body.service_id) : null;
-  if (serviceIdRaw) {
-    const svc = db.prepare('SELECT id, title FROM services WHERE id = ? AND active = 1').get(serviceIdRaw);
-    if (svc) { svcId = svc.id; svcTitle = svc.title; }
+  const svc = loadActiveService(serviceIdRaw);
+  if (svc) { svcId = svc.id; svcTitle = svc.title; }
+
+  // فازِ رزروِ آنلاین (هنوز غیرفعال/بدونِ UIِ عمومی): اگه یه اسلاتِ واقعیِ تاریخ+ساعت از قبل محاسبه‌شده فرستاده بشه،
+  // به‌جایِ booking_date=امروز/booking_time=NULLِ فازِ ۱، همون تاریخ/ساعتِ انتخابی + مدت‌زمانِ اسنپ‌شات‌شده ذخیره می‌شه.
+  // نوبت همچنان با status='pending' ثبت می‌شه — یعنی این یه «هولدِ نرم»ه، نه تاییدِ قطعی؛ پرسنل باید تاییدش کنه
+  // (طبقِ تصمیمِ صریحِ کاربر: نیازی به انتخابِ خودکارِ پرسنل نیست، اون تخصیص دستیِ بعدیِ پرسنله).
+  const bookingDateRaw = String(req.body?.booking_date || '').trim();
+  const bookingTimeRaw = String(req.body?.booking_time || '').trim();
+  const hasSlot = /^\d{4}-\d{2}-\d{2}$/.test(bookingDateRaw) && /^\d{2}:\d{2}$/.test(bookingTimeRaw);
+
+  let bookingDate = new Date().toISOString().slice(0, 10);
+  let bookingTime = null;
+  let durationMinutes = null;
+  if (hasSlot) {
+    const duration = getServiceDuration(svc);
+    if (!isSlotStillAvailable(bookingDateRaw, bookingTimeRaw, duration)) {
+      return res.status(409).json({ ok: false, error: 'این ساعت همین الان توسطِ یه نفرِ دیگه رزرو شد — یه ساعتِ دیگه رو انتخاب کن.' });
+    }
+    bookingDate = bookingDateRaw;
+    bookingTime = bookingTimeRaw;
+    durationMinutes = duration;
   }
 
   const customerId = resolveCustomerId(phone, name);
-  const today = new Date().toISOString().slice(0, 10);
   const noteBits = ['درخواست از سایت'];
-  if (preferredWhen) noteBits.push('ترجیحِ زمانی: ' + preferredWhen);
+  if (!hasSlot && preferredWhen) noteBits.push('ترجیحِ زمانی: ' + preferredWhen);
   if (noteRaw) noteBits.push(noteRaw);
 
   const info = db.prepare(`
-    INSERT INTO bookings (customer_name, customer_phone, customer_id, service_id, service_title, booking_date, booking_time, status, note)
-    VALUES (?, ?, ?, ?, ?, ?, NULL, 'pending', ?)
-  `).run(name, phone, customerId, svcId, svcTitle, today, noteBits.join(' — '));
+    INSERT INTO bookings (customer_name, customer_phone, customer_id, service_id, service_title, booking_date, booking_time, duration_minutes, status, note)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)
+  `).run(name, phone, customerId, svcId, svcTitle, bookingDate, bookingTime, durationMinutes, noteBits.join(' — '));
 
   res.json({ ok: true, id: Number(info.lastInsertRowid) });
 });

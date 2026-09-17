@@ -46,6 +46,16 @@ db.exec(`
     UNIQUE(staff_id, weekday)
   );
 
+  -- استثنایِ یه‌روزه‌یِ ساعتِ کاری (مرخصی/تعطیلیِ غیرِتکرارشونده) — برایِ فازِ رزروِ آنلاین
+  CREATE TABLE IF NOT EXISTS staff_exceptions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    staff_id INTEGER NOT NULL REFERENCES staff(id) ON DELETE CASCADE,
+    date TEXT NOT NULL,                        -- 'YYYY-MM-DD' میلادی
+    note TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(staff_id, date)
+  );
+
   -- خدمات
   CREATE TABLE IF NOT EXISTS services (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -170,7 +180,13 @@ if (!bookingsCols.includes('customer_id')) {
 }
 db.exec(`CREATE INDEX IF NOT EXISTS idx_bookings_customer ON bookings(customer_id);`);
 
-const SCHEMA_VERSION = '3';
+// مدت‌زمانِ نوبت لحظه‌ی ثبت (snapshot) — برای اینکه محاسبه‌ی اسلات‌های فازِ رزروِ آنلاین
+// بعداً با تغییرِ duration_minutes خودِ خدمت به‌هم نریزه
+if (!bookingsCols.includes('duration_minutes')) {
+  db.exec(`ALTER TABLE bookings ADD COLUMN duration_minutes INTEGER;`);
+}
+
+const SCHEMA_VERSION = '4';
 const row = db.prepare('SELECT value FROM _meta WHERE key = ?').get('schema_version');
 if (!row) {
   db.prepare('INSERT INTO _meta (key, value) VALUES (?, ?)').run('schema_version', SCHEMA_VERSION);
