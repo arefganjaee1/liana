@@ -264,7 +264,22 @@
         gate.classList.add('gate-hide');
         setTimeout(function () { gate.remove(); }, 300);
       }
-      if (bypass) { reveal(); return; }
+      function syncAccountButtonIfLoggedIn() {
+        // فقط برایِ حالتِ بایپس صدا زده می‌شه: صفحه رو جابه‌جا نمی‌کنه، فقط اگه لاگین بود
+        // متن/لینکِ دکمه‌ی پایینِ کارت رو از «ورود» به «بازگشت به حساب» عوض می‌کنه.
+        fetch('https://panel.liana.arefprojects.ir/api/customer/auth/me', { credentials: 'include' })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (data) {
+            if (data && data.ok) {
+              var btn = document.getElementById('accountBtn');
+              var label = document.getElementById('accountBtnLabel');
+              if (btn) btn.setAttribute('href', 'https://panel.liana.arefprojects.ir/portal/index.html');
+              if (label) label.textContent = 'بازگشت به حساب مشتری';
+            }
+          })
+          .catch(function () {});
+      }
+      if (bypass) { reveal(); syncAccountButtonIfLoggedIn(); return; }
       setTimeout(reveal, 1200); // فالبک: شبکه/سرور کند یا در دسترس نبود — بیشتر از این معطلِ کارت نمی‌مونیم
       fetch('https://panel.liana.arefprojects.ir/api/customer/auth/me', { credentials: 'include' })
         .then(function (r) { return r.ok ? r.json() : null; })
@@ -360,9 +375,9 @@
 
       <a class="cta glass-tint tap" href="sms:+989332650382" style="text-decoration:none; display:flex; align-items:center; justify-content:center;">رزرو نوبت<span class="cta-note">با پیامک به همین شماره</span></a>
 
-      <a class="cta glass tap" href="https://panel.liana.arefprojects.ir/portal/login.html" style="color:var(--accent-dark); font-weight:700; text-decoration:none; display:flex; align-items:center; justify-content:center; margin-top:10px;">
+      <a class="cta glass tap" id="accountBtn" href="https://panel.liana.arefprojects.ir/portal/login.html" style="color:var(--accent-dark); font-weight:700; text-decoration:none; display:flex; align-items:center; justify-content:center; margin-top:10px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="margin-inline-end:7px;"><circle cx="12" cy="8" r="3.3"/><path d="M5 20c0-3.9 3.1-6.5 7-6.5s7 2.6 7 6.5"/></svg>
-        ورود به حسابِ مشتری
+        <span id="accountBtnLabel">ورود به حساب مشتری</span>
       </a>
 
       <div style="display:flex; flex-direction:column; gap:10px;">
