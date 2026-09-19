@@ -10,6 +10,36 @@
 <link rel="stylesheet" href="css/portal.css">
 </head>
 <body>
+
+  <div class="auth-gate" id="authGate"><img src="assets/logo.png" alt=""></div>
+  <script>
+    /* اگه این گوشی از قبل سشنِ پورتالِ مشتری داره (یعنی از رویِ کارتِ ویزیت اومده و لاگین بوده)،
+       دیگه نباید فرمِ ورود رو ببینه — مستقیم بره تو حسابش. تا جوابِ این چک (یا حداکثر ۱.۲ ثانیه)
+       نیومده، پوششِ برندی رو صفحه‌ست، نه فرمِ ورود؛ اگه لاگین نبود، همین‌جا فرم رو نشون می‌دیم. */
+    (function () {
+      var gate = document.getElementById('authGate');
+      var settled = false;
+      function reveal() {
+        if (settled) return;
+        settled = true;
+        gate.classList.add('gate-hide');
+        setTimeout(function () { gate.remove(); }, 300);
+      }
+      setTimeout(reveal, 1200); // فالبک: شبکه/سرور کند یا در دسترس نبود — بیشتر از این معطلِ فرم نمی‌مونیم
+      fetch('/api/customer/auth/me', { credentials: 'include' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (data) {
+          if (settled) return; // تایم‌اوت زودتر رسیده، دیگه دیره
+          if (data && data.ok) {
+            window.location.replace('/portal/index.html');
+          } else {
+            reveal();
+          }
+        })
+        .catch(reveal);
+    })();
+  </script>
+
   <div class="wrap">
     <div class="brand">
       <span class="mark"><img src="assets/logo.png" alt="لیانا"></span>
