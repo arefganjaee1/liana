@@ -27,7 +27,7 @@
         <button class="tap" type="button" data-tab="massage">ماساژ</button>
       </div>
       <span class="nav-sep"></span>
-      <a href="#" class="cta-pill tap" data-open="book">رزرو نوبت</a>
+      <a href="#" class="cta-pill tap" data-open="book">درخواستِ مشاوره</a>
     </div>
     <button class="menu-btn tap" id="menuBtn" aria-label="باز کردن منو" aria-expanded="false" aria-controls="drawer">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
@@ -47,7 +47,7 @@
     <a href="#" class="tap" data-open="about">درباره‌ی ما</a>
     <a href="#contact" class="tap">تماس</a>
   </nav>
-  <a href="#" class="drawer-cta tap" data-open="book">رزرو نوبت</a>
+  <a href="#" class="drawer-cta tap" data-open="book">درخواستِ مشاوره</a>
   <a href="https://instagram.com/liana._clinic" target="_blank" rel="noopener" class="drawer-insta tap">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
     Liana._clinic
@@ -93,11 +93,11 @@
 
     <section class="case-hero">
       <div class="case-badge">LIANA CLINIC · 01</div>
-      <img src="assets/case-model-placeholder.jpg" alt="عکسِ نمونه‌ی موقت">
-      <div class="case-marker cp1" onclick="caseSelect(0)"><label>پیشانی</label><span class="dot"></span></div>
-      <div class="case-marker cp2" onclick="caseSelect(1)"><span class="dot"></span><label>دورِ چشم</label></div>
-      <div class="case-marker cp3" onclick="caseSelect(2)"><span class="dot"></span><label>گونه</label></div>
-      <div class="case-marker cp4" onclick="caseSelect(3)"><label>لب</label><span class="dot"></span></div>
+      <img src="assets/case-model-1.jpg" alt="عکسِ نمونه‌ی موقت">
+      <div class="case-marker cp1 label-above" onclick="caseSelect(0)"><span class="dot"></span><label>پیشانی</label></div>
+      <div class="case-marker cp2 label-left" onclick="caseSelect(1)"><span class="dot"></span><label>دورِ چشم</label></div>
+      <div class="case-marker cp3 label-right" onclick="caseSelect(2)"><span class="dot"></span><label>گونه</label></div>
+      <div class="case-marker cp4 label-below" onclick="caseSelect(3)"><span class="dot"></span><label>لب</label></div>
       <div class="case-counter"><button class="case-nav" onclick="casePrev()">‹</button><span class="case-num" id="caseCounter"></span><button class="case-nav" onclick="caseNext()">›</button></div>
     </section>
 
@@ -110,7 +110,7 @@
       <div class="case-divider"></div>
       <div class="case-selected-title">خدماتِ این نمونه‌کار</div>
       <div class="case-chips" id="caseChips"></div>
-      <div class="case-booking"><a class="case-book tap" id="caseReserveCta" href="#" data-open="book">رزروِ نوبت ←</a></div>
+      <div class="case-booking"><a class="case-book tap" id="caseReserveCta" href="#" data-open="book">درخواستِ مشاوره ←</a></div>
     </section>
   </div>
 </section>
@@ -169,7 +169,7 @@
 <div class="modal book-modal" id="bookModal" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="modal-body">
     <div class="book-modal-head">
-      <h3>رزروِ نوبت</h3>
+      <h3>درخواستِ مشاوره</h3>
       <button class="modal-close-plain tap" id="bookClose" aria-label="بستن" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
@@ -192,19 +192,35 @@
         </select>
       </div>
       <div class="book-field">
-        <label for="book_when">زمانِ ترجیحی</label>
-        <select id="book_when" name="preferred_when">
-          <option value="هرچه زودتر">هرچه زودتر</option>
-          <option value="امروز">امروز</option>
-          <option value="فردا">فردا</option>
-          <option value="این هفته">این هفته</option>
-          <option value="هفته‌ی بعد">هفته‌ی بعد</option>
-          <option value="فرقی نمی‌کنه">فرقی نمی‌کنه</option>
-        </select>
+        <label>زمانِ نوبت</label>
+        <div class="book-time-tabs" id="bookTimeTabs" role="tablist">
+          <button type="button" class="book-time-tab active" id="bookTabExact" data-mode="exact">انتخابِ دقیقِ زمان</button>
+          <button type="button" class="book-time-tab" id="bookTabFlexible" data-mode="flexible">فرقی نمی‌کنه</button>
+        </div>
+
+        <div class="book-time-exact" id="bookTimeExact">
+          <div class="book-day-strip" id="bookDayStrip" aria-label="روزها"></div>
+          <div class="book-slot-grid" id="bookSlotGrid"></div>
+          <p class="book-slot-hint" id="bookSlotHint" hidden></p>
+        </div>
+
+        <div class="book-time-flexible" id="bookTimeFlexible" hidden>
+          <p class="book-slot-hint">چه زمان‌هایی می‌تونی بیای؟ (می‌تونی چند موردو انتخاب کنی)</p>
+          <div class="book-slot-grid" id="bookWhenChips">
+            <button type="button" class="book-slot-chip" data-val="هرچه زودتر">هرچه زودتر</button>
+            <button type="button" class="book-slot-chip" data-val="امروز صبح">امروز صبح</button>
+            <button type="button" class="book-slot-chip" data-val="امروز عصر">امروز عصر</button>
+            <button type="button" class="book-slot-chip" data-val="فردا صبح">فردا صبح</button>
+            <button type="button" class="book-slot-chip" data-val="فردا عصر">فردا عصر</button>
+            <button type="button" class="book-slot-chip" data-val="این‌هفته">این‌هفته</button>
+            <button type="button" class="book-slot-chip" data-val="هفته‌ی بعد">هفته‌ی بعد</button>
+            <button type="button" class="book-slot-chip book-when-any" data-val="فرقی نمی‌کنه">فرقی نمی‌کنه</button>
+          </div>
+        </div>
       </div>
       <div class="book-field">
         <label for="book_note">توضیحاتِ تکمیلی (اختیاری)</label>
-        <textarea id="book_note" name="note" rows="2" placeholder="مثلاً ساعتِ ترجیحی یا هر نکته‌ی دیگه"></textarea>
+        <textarea id="book_note" name="note" rows="2" placeholder="مثلاً یه ساعتِ دقیق‌تر یا هر نکته‌ی دیگه"></textarea>
       </div>
       <p class="book-error" id="bookError" hidden></p>
       <button type="submit" class="book-submit tap" id="bookSubmitBtn">ثبتِ درخواست</button>
@@ -229,7 +245,7 @@
           <span class="name">لیانا</span>
         </div>
         <p class="footer-tagline">کلینیک تخصصی زیبایی — با دکتر فرناز گنجایی، بهترین نسخه‌ی خودت باش.</p>
-        <a href="#" class="drawer-cta tap" data-open="book" style="margin-top:16px; display:inline-block;">رزرو نوبت</a>
+        <a href="#" class="drawer-cta tap" data-open="book" style="margin-top:16px; display:inline-block;">درخواستِ مشاوره</a>
       </div>
 
       <div>
@@ -280,9 +296,10 @@
 </footer>
 
 <div class="sticky-cta-wrap">
-  <a href="#" class="sticky-cta tap" data-open="book">رزرو نوبت</a>
+  <a href="#" class="sticky-cta tap" data-open="book">درخواستِ مشاوره</a>
 </div>
 
+<script src="assets/jalali.js"></script>
 <script>
   window.addEventListener('DOMContentLoaded', () => { requestAnimationFrame(() => document.body.classList.add('loaded')); });
 
@@ -328,6 +345,9 @@
 
   /* ---------- مودالِ رزروِ نوبت — درخواست می‌ره تو همون جدولِ نوبت‌هایِ پنل، با وضعیتِ «در انتظارِ تایید» ---------- */
   const API_PANEL = 'https://panel.liana.arefprojects.ir';
+  // فازِ ۲ (انتخابِ دقیقِ تاریخ/ساعت) ساخته و تست شده، ولی به‌عمد خاموشه تا کلینیک اسکیل بشه (تصمیمِ ۱۴۰۵/۰۷/۰۵).
+  // کدش دست‌نخورده می‌مونه — فقط با تغییرِ همین یه خط به true دوباره روشن می‌شه.
+  const PHASE2_ONLINE_BOOKING_ENABLED = false;
   const bookModal = document.getElementById('bookModal');
   const bookBackdrop = document.getElementById('bookBackdrop');
   const bookClose = document.getElementById('bookClose');
@@ -337,6 +357,186 @@
   const bookServiceSelect = document.getElementById('book_service');
   const bookNoteField = document.getElementById('book_note');
   const bookSubmitBtn = document.getElementById('bookSubmitBtn');
+
+  const bookTimeTabs = document.getElementById('bookTimeTabs');
+  const bookTabExact = document.getElementById('bookTabExact');
+  const bookTabFlexible = document.getElementById('bookTabFlexible');
+  const bookTimeExact = document.getElementById('bookTimeExact');
+  const bookTimeFlexible = document.getElementById('bookTimeFlexible');
+  const bookDayStrip = document.getElementById('bookDayStrip');
+  const bookSlotGrid = document.getElementById('bookSlotGrid');
+  const bookSlotHint = document.getElementById('bookSlotHint');
+  const bookWhenChips = document.getElementById('bookWhenChips');
+  const FA = window.LianaJalali;
+  const WEEKDAY_SHORT_BY_NAME = { 'شنبه': 'ش', 'یکشنبه': 'ی', 'دوشنبه': 'د', 'سه‌شنبه': 'س', 'چهارشنبه': 'چ', 'پنجشنبه': 'پ', 'جمعه': 'ج' };
+  let timeMode = 'exact'; // 'exact' | 'flexible'
+  let selectedDate = null; // 'YYYY-MM-DD'
+  let selectedTime = null; // 'HH:MM'
+  let selectedWhens = []; // چندتا بازه‌ی زمانیِ آزاد که مشتری گفته می‌تونه بیاد
+  let daysAvailability = {}; // { iso: bool }
+  let daysRequestToken = 0;
+  let slotsRequestToken = 0;
+
+  function faNum(n) { return FA ? FA.faDigits(n) : String(n); }
+
+  function setSubmitEnabled() {
+    if (timeMode === 'flexible') { bookSubmitBtn.disabled = selectedWhens.length === 0; return; }
+    bookSubmitBtn.disabled = !selectedTime;
+  }
+
+  function renderWhenChips() {
+    bookWhenChips.querySelectorAll('.book-slot-chip').forEach((chip) => {
+      chip.classList.toggle('selected', selectedWhens.includes(chip.dataset.val));
+    });
+  }
+  bookWhenChips.querySelectorAll('.book-slot-chip').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      const val = chip.dataset.val;
+      const isAny = chip.classList.contains('book-when-any');
+      if (isAny) {
+        selectedWhens = selectedWhens.includes(val) ? [] : [val];
+      } else {
+        selectedWhens = selectedWhens.filter((v) => v !== 'فرقی نمی‌کنه');
+        if (selectedWhens.includes(val)) {
+          selectedWhens = selectedWhens.filter((v) => v !== val);
+        } else {
+          selectedWhens.push(val);
+        }
+      }
+      renderWhenChips();
+      setSubmitEnabled();
+    });
+  });
+
+  function switchTab(mode) {
+    timeMode = mode;
+    bookTabExact.classList.toggle('active', mode === 'exact');
+    bookTabFlexible.classList.toggle('active', mode === 'flexible');
+    bookTimeExact.hidden = mode !== 'exact';
+    bookTimeFlexible.hidden = mode !== 'flexible';
+    setSubmitEnabled();
+  }
+  bookTabExact.addEventListener('click', () => switchTab('exact'));
+  bookTabFlexible.addEventListener('click', () => switchTab('flexible'));
+
+  function renderDayStrip() {
+    bookDayStrip.innerHTML = '';
+    Object.keys(daysAvailability).forEach((iso) => {
+      const available = daysAvailability[iso];
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'book-day-chip' + (available ? '' : ' disabled');
+      chip.dataset.date = iso;
+      let wdShort = '';
+      let dayNum = '';
+      if (FA) {
+        const fullWd = FA.weekdayFromISO(iso);
+        wdShort = WEEKDAY_SHORT_BY_NAME[fullWd] || fullWd.slice(0, 1);
+        const p = iso.split('-').map(Number);
+        const j = FA.toJalali(p[0], p[1], p[2]);
+        dayNum = faNum(j.jd);
+      } else {
+        dayNum = iso.slice(8, 10);
+      }
+      chip.innerHTML = '<span class="wd">' + wdShort + '</span><span class="d">' + dayNum + '</span>';
+      if (available) {
+        chip.addEventListener('click', () => selectDay(iso, chip));
+      } else {
+        chip.disabled = true;
+      }
+      bookDayStrip.appendChild(chip);
+    });
+  }
+
+  function selectDay(iso, chipEl) {
+    selectedDate = iso;
+    selectedTime = null;
+    setSubmitEnabled();
+    bookDayStrip.querySelectorAll('.book-day-chip').forEach((c) => c.classList.remove('selected'));
+    if (chipEl) chipEl.classList.add('selected');
+    loadSlotsForDay(iso);
+  }
+
+  function loadSlotsForDay(iso) {
+    const myToken = ++slotsRequestToken;
+    bookSlotGrid.innerHTML = '';
+    bookSlotHint.textContent = 'در حالِ بارگذاریِ ساعت‌هایِ خالی...';
+    bookSlotHint.hidden = false;
+    const params = new URLSearchParams({ date: iso });
+    if (bookServiceSelect.value) params.set('service_id', bookServiceSelect.value);
+    fetch(API_PANEL + '/api/public/availability/slots?' + params.toString())
+      .then((r) => r.json())
+      .then((data) => {
+        if (myToken !== slotsRequestToken) return; // یه درخواستِ جدیدتر (روزِ دیگه) جایگزین شد
+        bookSlotGrid.innerHTML = '';
+        const slots = (data && data.ok && Array.isArray(data.slots)) ? data.slots : [];
+        if (!slots.length) {
+          bookSlotHint.textContent = 'برایِ این روز دیگه ظرفیتی نمونده — یه روزِ دیگه رو امتحان کن.';
+          bookSlotHint.hidden = false;
+          return;
+        }
+        bookSlotHint.hidden = true;
+        slots.forEach((time) => {
+          const chip = document.createElement('button');
+          chip.type = 'button';
+          chip.className = 'book-slot-chip';
+          chip.textContent = faNum(time);
+          chip.addEventListener('click', () => {
+            selectedTime = time;
+            bookSlotGrid.querySelectorAll('.book-slot-chip').forEach((c) => c.classList.remove('selected'));
+            chip.classList.add('selected');
+            setSubmitEnabled();
+          });
+          bookSlotGrid.appendChild(chip);
+        });
+      })
+      .catch(() => {
+        if (myToken !== slotsRequestToken) return;
+        bookSlotHint.textContent = 'مشکلی تو بارگذاریِ ساعت‌ها پیش اومد — می‌تونی از تبِ «فرقی نمی‌کنه» استفاده کنی.';
+        bookSlotHint.hidden = false;
+      });
+  }
+
+  function loadDaysAvailability() {
+    const myToken = ++daysRequestToken;
+    daysAvailability = {};
+    bookDayStrip.innerHTML = '<p class="book-slot-hint">در حالِ بارگذاریِ روزها...</p>';
+    bookSlotGrid.innerHTML = '';
+    bookSlotHint.hidden = true;
+    selectedDate = null;
+    selectedTime = null;
+    setSubmitEnabled();
+    const params = new URLSearchParams();
+    if (bookServiceSelect.value) params.set('service_id', bookServiceSelect.value);
+    fetch(API_PANEL + '/api/public/availability/days?' + params.toString())
+      .then((r) => r.json())
+      .then((data) => {
+        if (myToken !== daysRequestToken) return;
+        if (!data || !data.ok || !data.days) throw new Error('bad-response');
+        daysAvailability = data.days;
+        renderDayStrip();
+        const firstAvailable = Object.keys(daysAvailability).find((iso) => daysAvailability[iso]);
+        if (firstAvailable) {
+          const chip = bookDayStrip.querySelector('[data-date="' + firstAvailable + '"]');
+          selectDay(firstAvailable, chip);
+        } else {
+          bookSlotHint.textContent = 'فعلاً ظرفیتِ خالی‌ای نداریم — از تبِ «فرقی نمی‌کنه» استفاده کن تا هماهنگ کنیم.';
+          bookSlotHint.hidden = false;
+        }
+      })
+      .catch(() => {
+        if (myToken !== daysRequestToken) return;
+        // اگه تقویم اصلاً لود نشد (شبکه/سرور)، بی‌سروصدا برو رو حالتِ «فرقی نمی‌کنه» — کاربر تو یه تقویمِ خالی/خراب گیر نکنه
+        bookDayStrip.innerHTML = '';
+        bookTabExact.disabled = true;
+        bookTabExact.title = 'موقتاً در دسترس نیست';
+        switchTab('flexible');
+      });
+  }
+
+  bookServiceSelect.addEventListener('change', () => {
+    if (!bookTabExact.disabled) loadDaysAvailability();
+  });
 
   let bookServicesRequested = false;
   function loadBookServices() {
@@ -364,7 +564,19 @@
     bookError.hidden = true;
     bookSubmitBtn.disabled = false;
     bookSubmitBtn.textContent = 'ثبتِ درخواست';
+    selectedWhens = [];
+    renderWhenChips();
     loadBookServices();
+    if (PHASE2_ONLINE_BOOKING_ENABLED) {
+      bookTimeTabs.hidden = false;
+      bookTabExact.disabled = false;
+      switchTab('exact');
+      loadDaysAvailability();
+    } else {
+      bookTimeTabs.hidden = true;
+      bookTabExact.disabled = true;
+      switchTab('flexible');
+    }
     if (prefillNote) bookNoteField.value = prefillNote;
     bookModal.classList.add('open'); bookBackdrop.classList.add('open');
     bookModal.setAttribute('aria-hidden', 'false');
@@ -389,28 +601,42 @@
     bookError.hidden = true;
     bookSubmitBtn.disabled = true;
     bookSubmitBtn.textContent = 'در حالِ ثبت...';
+    const payload = {
+      name: document.getElementById('book_name').value,
+      phone: document.getElementById('book_phone').value,
+      service_id: bookServiceSelect.value || null,
+      note: bookNoteField.value,
+    };
+    if (timeMode === 'exact' && selectedDate && selectedTime) {
+      payload.booking_date = selectedDate;
+      payload.booking_time = selectedTime;
+      payload.preferred_when = '';
+    } else {
+      payload.preferred_when = selectedWhens.join('،‌ ');
+    }
     fetch(API_PANEL + '/api/public/booking-request', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: document.getElementById('book_name').value,
-        phone: document.getElementById('book_phone').value,
-        service_id: bookServiceSelect.value || null,
-        preferred_when: document.getElementById('book_when').value,
-        note: bookNoteField.value,
-      }),
+      body: JSON.stringify(payload),
     })
       .then(async (r) => {
         const data = await r.json().catch(() => ({}));
-        if (!r.ok || !data.ok) throw new Error(data.error || 'خطایی پیش اومد، دوباره امتحان کن.');
+        if (!r.ok || !data.ok) {
+          const err = new Error(data.error || 'خطایی پیش اومد، دوباره امتحان کن.');
+          err.status = r.status;
+          throw err;
+        }
         bookForm.hidden = true;
         bookSuccess.hidden = false;
       })
       .catch((err) => {
         bookError.textContent = err.message || 'خطایی پیش اومد، دوباره امتحان کن.';
         bookError.hidden = false;
+        // اگه اسلات همین الان توسطِ یه نفرِ دیگه گرفته شد (۴۰۹)، لیستِ همون روز رو دوباره لود کن تا ساعتِ گرفته‌شده حذف بشه
+        if (err.status === 409 && selectedDate) loadSlotsForDay(selectedDate);
         bookSubmitBtn.disabled = false;
         bookSubmitBtn.textContent = 'ثبتِ درخواست';
+        setSubmitEnabled();
       });
   });
 
@@ -490,7 +716,7 @@
     { key: 'botox', cat: 'inj', title: 'بوتاکس و فیلر', desc: 'رفع خطوط و حجم‌دهی طبیعی به لب و صورت.', img: 'assets/hero-after.jpg', pair: null, ready: false, detail: [{ before: 'assets/hero-before.jpg', beforePos: '50% 45%', after: 'assets/hero-after.jpg', afterPos: '50% 72%' }, { before: 'assets/hero-before-2.jpg', after: 'assets/hero-after-2.jpg' }], variants: ['بوتاکسِ رگولار', 'بوتاکسِ دیسپورت (Dysport)', 'فیلرِ لب'] },
     { key: 'eye-treat', cat: 'inj', title: 'فیلر و درمانِ دورِ چشم', desc: 'رفعِ گودیِ زیرِ چشم و جوان‌سازیِ ناحیه‌ی حساسِ دورِ چشم.', img: null, pair: null, ready: false, detail: [], variants: ['Jalupro Young Eye', 'فیلرِ ELOHA چشم'] },
     { key: 'rf-face', cat: 'skin', title: 'جوان‌سازی صورت با RF', desc: 'سفت و جوان‌تر کردن پوست صورت با امواج رادیویی.', img: null, pair: null, ready: false, detail: [] },
-    { key: 'rf-body', cat: 'skin', title: 'لاغری و کاهشِ وزن', desc: 'کاهشِ چربیِ موضعی و فرم‌دهیِ بدن، یا کاهشِ وزن با تزریقِ دارویی زیرِ نظرِ پزشک.', img: null, pair: null, ready: false, detail: [], variants: ['دستگاهِ رادیوفرکانسیِ RF (لاغریِ موضعی)', 'تزریقِ مونجارو (زیرِ نظرِ پزشک)'] },
+    { key: 'rf-body', cat: 'skin', title: 'لاغری و کاهشِ وزن', desc: 'کاهشِ چربیِ موضعی و فرم‌دهیِ بدن، یا کاهشِ وزن با تزریقِ دارویی زیرِ نظرِ پزشک.', img: null, pair: null, ready: false, detail: [], variants: ['دستگاهِ رادیوفرکانسیِ RF (لاغریِ موضعی)', 'تزریقِ دارویِ لاغری (زیرِ نظرِ پزشک)'] },
     { key: 'meso', cat: 'skin', title: 'مزوتراپی', desc: 'تقویت و شادابی پوست با تزریق ویتامین و مواد مغذی.', img: null, pair: null, ready: false, detail: [], variants: ['مزوتراپیِ پوست', 'هیرفیلر (مزوتراپیِ مو)'] },
     { key: 'mcare', cat: 'skin', title: 'دستگاه mCare — سلولیت و اندرمولوژی', desc: 'کاهشِ سلولیت و فرم‌دهیِ بدن با تکنولوژیِ اندرمولوژی.', img: null, pair: null, ready: false, detail: [] },
     { key: 'massage', cat: 'massage', title: 'ماساژ تخصصی', desc: 'ریلکسیشن و بهبود گردش خون.', img: null, pair: null, ready: false, detail: [] },
@@ -531,7 +757,7 @@
     return '<article class="svc-card' + (extraClass || '') + '" data-svc="' + svc.key + '" tabindex="0" role="button" aria-haspopup="dialog">' +
       '<div class="svc-media">' + mediaHTML + '</div>' +
       '<div class="svc-info">' +
-        '<div class="svc-title-row"><h3>' + svc.title + '</h3><span class="svc-chip ' + (svc.ready ? 'ready' : 'soon') + '">' + (svc.ready ? 'آماده‌ی رزرو' : 'به‌زودی') + '</span></div>' +
+        '<div class="svc-title-row"><h3>' + svc.title + '</h3><span class="svc-chip ' + (svc.ready ? 'ready' : 'soon') + '">' + (svc.ready ? 'آماده‌ی مشاوره' : 'به‌زودی') + '</span></div>' +
         '<p>' + svc.desc + '</p>' +
       '</div>' +
     '</article>';
@@ -558,6 +784,7 @@
   const svcModalBody = document.getElementById('svcModalBody');
 
   const SVC_FACTS = [
+    { k: 'قیمت', v: 'پس از مشاوره' },
     { k: 'مدت جلسه', v: null },
     { k: 'تعداد جلسات پیشنهادی', v: null },
     { k: 'زمان نقاهت', v: null }
@@ -670,7 +897,7 @@
       '<p>' + descText + '</p>' +
       factsHTML +
       variantsHTML +
-      '<button type="button" class="drawer-cta tap svc-reserve-cta" id="svcReserveCta">رزرو نوبت</button>';
+      '<button type="button" class="drawer-cta tap svc-reserve-cta" id="svcReserveCta">درخواستِ مشاوره</button>';
 
     function reserveNote(variant) {
       return 'خدمتِ موردنظر: ' + svc.title + (variant ? (' — ' + variant) : '');
