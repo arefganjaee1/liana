@@ -1,0 +1,512 @@
+<title>راهنمای اکوسیستم لیانا</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* پالت: کرمِ گرمِ برندِ لیانا + سبزآبیِ واقعیِ لوگو؛ تایپ: وزیرمتن برایِ همه‌چیز، جِت‌براینز‌مونو برایِ آدرس/کد.
+     چیدمان: هدرِ چسبان با ناوبریِ تبی، زیرش کارت‌هایِ محتوا بر اساسِ بخش. */
+  :root{
+    direction: rtl;
+    --cream: #f7f1e5;
+    --cream-2: #efe4cf;
+    --card: #fffcf6;
+    --ink: #2c241c;
+    --ink-soft: #6e6152;
+    --line: #e4d8bf;
+    --accent: #128377;
+    --accent-light: #4fb0a3;
+    --accent-dark: #0b5f56;
+    --accent-tint: #e4f2ef;
+    --ok: #2f8f5b;
+    --ok-tint: #e6f5ec;
+    --wait: #b8790f;
+    --wait-tint: #faf0dd;
+    --off: #8b8071;
+    --off-tint: #efe9dc;
+    --shadow: 0 10px 28px -12px rgba(43,36,25,.18);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --cream: #17211f;
+      --cream-2: #1d2a27;
+      --card: #1c2725;
+      --ink: #ede3d2;
+      --ink-soft: #a99e8c;
+      --line: #33423e;
+      --accent: #4fb0a3;
+      --accent-light: #6fc4b8;
+      --accent-dark: #8fd8cd;
+      --accent-tint: #223532;
+      --ok: #7dd6a4;
+      --ok-tint: #1e332a;
+      --wait: #e3b45c;
+      --wait-tint: #362d1a;
+      --off: #a99e8c;
+      --off-tint: #2a2521;
+      --shadow: 0 10px 28px -12px rgba(0,0,0,.5);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --cream: #17211f;
+    --cream-2: #1d2a27;
+    --card: #1c2725;
+    --ink: #ede3d2;
+    --ink-soft: #a99e8c;
+    --line: #33423e;
+    --accent: #4fb0a3;
+    --accent-light: #6fc4b8;
+    --accent-dark: #8fd8cd;
+    --accent-tint: #223532;
+    --ok: #7dd6a4;
+    --ok-tint: #1e332a;
+    --wait: #e3b45c;
+    --wait-tint: #362d1a;
+    --off: #a99e8c;
+    --off-tint: #2a2521;
+    --shadow: 0 10px 28px -12px rgba(0,0,0,.5);
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--cream); color:var(--ink);
+    font-family:'Vazirmatn',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{ font-family:'JetBrains Mono',ui-monospace,monospace; direction:ltr; unicode-bidi:isolate; }
+
+  a{ color:var(--accent-dark); }
+  :root[data-theme="dark"] a, @media (prefers-color-scheme: dark){ a{ color:var(--accent-light); } }
+
+  .wrap{ max-width:920px; margin:0 auto; padding-inline:18px; }
+
+  header.top{
+    position:sticky; top:env(safe-area-inset-top,0px); z-index:20;
+    background:linear-gradient(180deg, var(--cream) 82%, transparent);
+    padding-top:14px;
+  }
+  .brand-row{ display:flex; align-items:center; gap:10px; padding-block:6px 12px; }
+  .brand-badge{
+    width:34px; height:34px; border-radius:10px; flex:none;
+    background:linear-gradient(135deg,var(--accent-light),var(--accent-dark));
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-weight:800; font-size:15px; box-shadow:var(--shadow);
+  }
+  .brand-text h1{ margin:0; font-size:17px; font-weight:800; letter-spacing:.2px; }
+  .brand-text p{ margin:1px 0 0; font-size:12px; color:var(--ink-soft); }
+
+  nav.tabs{
+    display:flex; gap:6px; overflow-x:auto; padding-bottom:12px;
+    -ms-overflow-style:none; scrollbar-width:none;
+  }
+  nav.tabs::-webkit-scrollbar{ display:none; }
+  nav.tabs button{
+    flex:none; border:1px solid var(--line); background:var(--card); color:var(--ink-soft);
+    font-family:inherit; font-size:13px; font-weight:600; padding:8px 14px; border-radius:999px;
+    cursor:pointer; transition:.15s; white-space:nowrap;
+  }
+  nav.tabs button:active{ transform:scale(.96); }
+  nav.tabs button.active{ background:var(--accent); border-color:var(--accent); color:#fff; }
+
+  main{ padding-bottom:56px; }
+  section.panel{ display:none; }
+  section.panel.active{ display:block; animation:fade .25s ease; }
+  @media (prefers-reduced-motion: reduce){ section.panel.active{ animation:none; } }
+  @keyframes fade{ from{ opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+
+  h2.lead{ font-size:21px; font-weight:800; margin:4px 0 6px; text-wrap:balance; }
+  p.sub{ color:var(--ink-soft); font-size:14.5px; line-height:1.9; margin:0 0 20px; max-width:64ch; }
+
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:16px 18px; box-shadow:var(--shadow);
+  }
+  .stack{ display:flex; flex-direction:column; gap:12px; }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media (max-width:600px){ .grid2{ grid-template-columns:1fr; } }
+
+  /* کارت‌هایِ لینکِ سریع */
+  .link-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:22px; }
+  @media (max-width:560px){ .link-grid{ grid-template-columns:1fr; } }
+  .link-card{
+    background:var(--card); border:1px solid var(--line); border-radius:14px; padding:13px 14px;
+    display:flex; flex-direction:column; gap:6px;
+  }
+  .link-card .tag{ font-size:11px; font-weight:700; color:var(--accent-dark); letter-spacing:.3px; }
+  .link-card .url-row{ display:flex; align-items:center; gap:8px; justify-content:space-between; }
+  .link-card .url{ font-size:12.5px; word-break:break-all; }
+  .link-card .who{ font-size:12px; color:var(--ink-soft); }
+  .copy-btn{
+    flex:none; border:1px solid var(--line); background:var(--cream-2); color:var(--ink);
+    font-family:inherit; font-size:11px; font-weight:600; padding:5px 9px; border-radius:8px; cursor:pointer;
+  }
+  .copy-btn.done{ background:var(--ok-tint); color:var(--ok); border-color:var(--ok); }
+
+  /* تایم‌لاینِ مسیرِ مشتری */
+  .timeline{ position:relative; padding-inline-start:0; margin:0; list-style:none; }
+  .step{ position:relative; display:flex; gap:14px; padding-bottom:22px; }
+  .step:last-child{ padding-bottom:0; }
+  .step .num{
+    flex:none; width:30px; height:30px; border-radius:50%; background:var(--accent);
+    color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px;
+    font-variant-numeric:tabular-nums; position:relative; z-index:1;
+  }
+  .step:not(:last-child)::before{
+    content:""; position:absolute; inset-inline-start:14px; top:30px; bottom:-4px; width:2px;
+    background:var(--line);
+  }
+  .step .body{ padding-top:3px; }
+  .step .body h3{ margin:0 0 4px; font-size:14.5px; font-weight:700; }
+  .step .body p{ margin:0; font-size:13.5px; color:var(--ink-soft); line-height:1.8; }
+  .step .body .note{
+    display:inline-block; margin-top:7px; font-size:12px; background:var(--accent-tint);
+    color:var(--accent-dark); padding:4px 9px; border-radius:8px;
+  }
+
+  /* پیل‌هایِ وضعیتِ نوبت */
+  .pill{ display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; padding:3px 10px; border-radius:999px; }
+  .pill.wait{ background:var(--wait-tint); color:var(--wait); }
+  .pill.ok{ background:var(--ok-tint); color:var(--ok); }
+  .pill.off{ background:var(--off-tint); color:var(--off); }
+
+  /* چک‌لیستِ کارِ روزانه */
+  ol.tasklist{ margin:0; padding-inline-start:0; list-style:none; counter-reset:t; display:flex; flex-direction:column; gap:10px; }
+  ol.tasklist li{ counter-increment:t; display:flex; gap:10px; font-size:14px; line-height:1.85; }
+  ol.tasklist li::before{
+    content:counter(t); flex:none; width:22px; height:22px; border-radius:7px; background:var(--accent-tint);
+    color:var(--accent-dark); font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center;
+    font-variant-numeric:tabular-nums; margin-top:1px;
+  }
+  ol.tasklist b{ color:var(--ink); }
+
+  details.acc{ background:var(--card); border:1px solid var(--line); border-radius:14px; overflow:hidden; }
+  details.acc + details.acc{ margin-top:10px; }
+  details.acc summary{
+    cursor:pointer; padding:13px 16px; font-weight:700; font-size:14px; list-style:none;
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+  }
+  details.acc summary::-webkit-details-marker{ display:none; }
+  details.acc summary::after{ content:"+"; color:var(--accent); font-size:18px; font-weight:400; flex:none; }
+  details.acc[open] summary::after{ content:"–"; }
+  details.acc .acc-body{ padding:0 16px 16px; font-size:13.5px; color:var(--ink-soft); line-height:1.85; }
+  details.acc .acc-body p{ margin:0 0 8px; }
+  details.acc .acc-body p:last-child{ margin-bottom:0; }
+
+  .status-grid{ display:grid; grid-template-columns:1fr; gap:12px; }
+  .status-card{ border-radius:14px; padding:14px 16px; border:1px solid var(--line); background:var(--card); }
+  .status-card h3{ margin:0 0 9px; font-size:13.5px; display:flex; align-items:center; gap:8px; }
+  .dot{ width:9px; height:9px; border-radius:50%; flex:none; }
+  .dot.live{ background:var(--ok); }
+  .dot.hidden-f{ background:var(--wait); }
+  .dot.todo{ background:var(--off); }
+  .status-card ul{ margin:0; padding-inline-start:18px; font-size:13.5px; color:var(--ink-soft); line-height:1.9; }
+  .status-card ul li::marker{ color:var(--line); }
+
+  .callout{
+    background:var(--wait-tint); border:1px solid color-mix(in srgb, var(--wait) 35%, var(--line));
+    border-radius:12px; padding:11px 14px; font-size:13px; color:var(--ink); line-height:1.8; margin-top:14px;
+  }
+  .callout b{ color:var(--wait); }
+
+  footer{ text-align:center; padding:28px 0 10px; font-size:12px; color:var(--ink-soft); }
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand-row">
+      <div class="brand-badge">L</div>
+      <div class="brand-text">
+        <h1>راهنمای اکوسیستم لیانا</h1>
+        <p>سایت، کارتِ NFC، پنلِ مدیریت و پورتالِ مشتری — یک‌جا</p>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button data-tab="overview">نمای‌کلی</button>
+      <button data-tab="journey">مسیرِ مشتری</button>
+      <button data-tab="reception">برایِ پذیرش</button>
+      <button data-tab="doctor">برایِ دکتر فرناز</button>
+      <button data-tab="card">کارتِ NFC</button>
+      <button data-tab="status">وضعیت و نقشه‌راه</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ===== نمای‌کلی ===== -->
+  <section class="panel" id="p-overview">
+    <h2 class="lead">یک اکوسیستم، چهار بخشِ متصل به‌هم</h2>
+    <p class="sub">لیانا از یک «سایت» ساده شروع شد، ولی الان چهار تکه‌ی جدا داره که با هم کار می‌کنن: مشتری از سایت یا کارت وارد می‌شه، درخواستش تو پنل می‌شینه، و بعد از اولین نوبت، خودش هم یک حساب تو پورتال داره. برایِ وضعیتِ فعلیِ کلینیک (یک دکتر) این چهار تکه به‌اندازه‌ی کافی ساخته شدن؛ هرچی لازم بود برایِ رشدِ بعدی، بدونِ حذفِ چیزی، آماده‌ی روشن‌شدنه.</p>
+
+    <div class="link-grid">
+      <div class="link-card">
+        <span class="tag">سایتِ عمومی</span>
+        <div class="url-row"><span class="url mono">liana.arefprojects.ir</span><button class="copy-btn" data-copy="https://liana.arefprojects.ir">کپی</button></div>
+        <span class="who">برایِ همه — معرفی، خدمات، فرمِ درخواستِ مشاوره</span>
+      </div>
+      <div class="link-card">
+        <span class="tag">کارتِ NFC</span>
+        <div class="url-row"><span class="url mono">liana.arefprojects.ir/card</span><button class="copy-btn" data-copy="https://liana.arefprojects.ir/card/">کپی</button></div>
+        <span class="who">با لمسِ کارتِ فیزیکی باز می‌شه</span>
+      </div>
+      <div class="link-card">
+        <span class="tag">پنلِ مدیریت</span>
+        <div class="url-row"><span class="url mono">panel.liana.arefprojects.ir/admin</span><button class="copy-btn" data-copy="https://panel.liana.arefprojects.ir/admin/">کپی</button></div>
+        <span class="who">برایِ منشی و دکتر فرناز</span>
+      </div>
+      <div class="link-card">
+        <span class="tag">پورتالِ مشتری</span>
+        <div class="url-row"><span class="url mono">panel.liana.arefprojects.ir/portal</span><button class="copy-btn" data-copy="https://panel.liana.arefprojects.ir/portal/login.html">کپی</button></div>
+        <span class="who">برایِ مراجعه‌کننده‌هایی که حداقل یک نوبت داشتن</span>
+      </div>
+    </div>
+
+    <div class="card stack">
+      <div class="grid2">
+        <div>
+          <h3 style="margin:0 0 5px;font-size:14px;">۱. سایتِ عمومی</h3>
+          <p style="margin:0;font-size:13px;color:var(--ink-soft);line-height:1.8;">معرفیِ کلینیک، لیستِ خدمات، نمونه‌کار، و دکمه‌ی «درخواستِ مشاوره» که مستقیم به پنل وصله.</p>
+        </div>
+        <div>
+          <h3 style="margin:0 0 5px;font-size:14px;">۲. کارتِ هوشمندِ NFC</h3>
+          <p style="margin:0;font-size:13px;color:var(--ink-soft);line-height:1.8;">یک کارتِ فیزیکی که با لمسِ گوشی، آدرسِ کارتِ دیجیتال رو باز می‌کنه — برایِ مشتریِ لاگین‌شده، مستقیم می‌ره تو حسابِ خودش.</p>
+        </div>
+        <div>
+          <h3 style="margin:0 0 5px;font-size:14px;">۳. پنلِ مدیریت</h3>
+          <p style="margin:0;font-size:13px;color:var(--ink-soft);line-height:1.8;">جایی که منشی و دکتر فرناز خدمات/پرسنل/نوبت‌ها/مشتری‌ها رو مدیریت می‌کنن.</p>
+        </div>
+        <div>
+          <h3 style="margin:0 0 5px;font-size:14px;">۴. پورتالِ مشتری</h3>
+          <p style="margin:0;font-size:13px;color:var(--ink-soft);line-height:1.8;">حسابِ شخصیِ هر مراجعه‌کننده: امتیازِ باشگاه، تاریخچه‌ی نوبت‌ها.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== مسیر مشتری ===== -->
+  <section class="panel" id="p-journey">
+    <h2 class="lead">از لمسِ کارت تا مشتریِ ثابت</h2>
+    <p class="sub">این دقیقاً همون مسیریه که یک مراجعه‌کننده‌ی واقعی طی می‌کنه — از اولین آشنایی تا داشتنِ حسابِ شخصی.</p>
+
+    <ul class="timeline">
+      <li class="step">
+        <span class="num">۱</span>
+        <div class="body">
+          <h3>آشنایی</h3>
+          <p>یا از اینستاگرام/توصیه وارد سایت می‌شه، یا کارتِ NFCِ لیانا رو با گوشیش لمس می‌کنه و صفحه‌ی معرفیِ کلینیک باز می‌شه.</p>
+        </div>
+      </li>
+      <li class="step">
+        <span class="num">۲</span>
+        <div class="body">
+          <h3>مشاهده‌ی خدمات</h3>
+          <p>خدمات، نمونه‌کار، و توضیحات رو می‌بینه. قیمتِ دقیق فعلاً همه‌جا «پس از مشاوره» نوشته شده، چون هنوز با دکتر فرناز نهایی نشده.</p>
+        </div>
+      </li>
+      <li class="step">
+        <span class="num">۳</span>
+        <div class="body">
+          <h3>درخواستِ مشاوره</h3>
+          <p>رویِ دکمه‌ی «درخواستِ مشاوره» می‌زنه، اسم/شماره رو می‌ده، چندتا بازه‌ی زمانی که خودش می‌تونه بیاد رو انتخاب می‌کنه (مثلاً «فردا عصر» + «این‌هفته»).</p>
+          <span class="note">این یک رزروِ قطعی نیست — فقط یک درخواسته</span>
+        </div>
+      </li>
+      <li class="step">
+        <span class="num">۴</span>
+        <div class="body">
+          <h3>ثبتِ خودکار تو پنل</h3>
+          <p>همون لحظه، یک نوبتِ جدید با وضعیتِ <span class="pill wait">در انتظار</span> تو پنل ساخته می‌شه. اگه شماره‌ش تازه باشه، یک پروفایلِ مشتریِ جدید هم خودکار ساخته می‌شه — پذیرش کارِ دستیِ اضافه‌ای نداره.</p>
+        </div>
+      </li>
+      <li class="step">
+        <span class="num">۵</span>
+        <div class="body">
+          <h3>تماسِ پذیرش</h3>
+          <p>منشی یا دکتر فرناز تو پنل این درخواست رو می‌بینه، با مشتری تماس می‌گیره، یک زمانِ دقیق هماهنگ می‌کنه و همون نوبت رو به <span class="pill ok">تأییدشده</span> تغییر می‌ده.</p>
+        </div>
+      </li>
+      <li class="step">
+        <span class="num">۶</span>
+        <div class="body">
+          <h3>روزِ نوبت</h3>
+          <p>بعدِ انجامِ خدمت، وضعیت به <span class="pill ok">انجام‌شده</span> تغییر می‌کنه — دقیقاً همین لحظه‌ست که امتیازِ باشگاه‌مشتریانش یکی زیاد می‌شه.</p>
+        </div>
+      </li>
+      <li class="step">
+        <span class="num">۷</span>
+        <div class="body">
+          <h3>حسابِ شخصی (اختیاری)</h3>
+          <p>حالا که حداقل یک نوبت داشته، می‌تونه با همون شماره وارد پورتال بشه (لینکش رو کارتِ NFC هست) و امتیاز/تاریخچه‌ش رو ببینه.</p>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ===== برای پذیرش ===== -->
+  <section class="panel" id="p-reception">
+    <h2 class="lead">کارِ روزانه‌ی پذیرش/منشی</h2>
+    <p class="sub">ورود از <a href="https://panel.liana.arefprojects.ir/admin/" target="_blank" rel="noopener">panel.liana.arefprojects.ir/admin</a> با همون یوزرنیم/پسوردی که موقعِ راه‌اندازی ساخته شده.</p>
+
+    <div class="card" style="margin-bottom:16px;">
+      <h3 style="margin:0 0 12px;font-size:14.5px;">هر روز، این ترتیب رو دنبال کن</h3>
+      <ol class="tasklist">
+        <li>تبِ <b>«نوبت‌ها»</b> رو باز کن و فیلترِ «امروز» یا «همه‌ی نوبت‌ها» رو بزن.</li>
+        <li>نوبت‌هایی که پیلِ <span class="pill wait">در انتظار</span> دارن، از فرمِ سایت اومدن — این‌ها منتظرِ تماسِ تو هستن.</li>
+        <li>رویِ نوبت کلیک کن، یادداشتِ «زمانِ ترجیحی» رو بخون، با مشتری تماس بگیر و زمانِ دقیق رو هماهنگ کن.</li>
+        <li>تو همون فرم: تاریخ/ساعتِ دقیق و پرسنلِ انجام‌دهنده رو ثبت کن، وضعیت رو به <span class="pill ok">تأییدشده</span> تغییر بده.</li>
+        <li>روزِ نوبت، بعدِ اینکه خدمت انجام شد → وضعیت به <span class="pill ok">انجام‌شده</span>. اگه نیومد یا کنسل کرد → <span class="pill off">لغوشده</span>.</li>
+      </ol>
+    </div>
+
+    <div class="stack">
+      <details class="acc">
+        <summary>بخشِ «مشتریان» چیکار می‌کنه؟</summary>
+        <div class="acc-body">
+          <p>جست‌وجو با اسم یا شماره، دیدنِ تعدادِ نوبت‌ها و آخرین مراجعه، و تکمیلِ اطلاعاتِ هر مشتری: تاریخِ تولد، آدرس، حساسیت/آلرژی، یادداشتِ پزشکی، و رضایتِ استفاده از عکسِ قبل/بعدش برایِ تبلیغات.</p>
+          <p>هر نوبتِ جدید با شماره‌تلفن، خودش پروفایلِ مشتری رو می‌سازه یا به پروفایلِ موجود وصل می‌شه — نیازی به ساختنِ دستیِ مشتری نیست.</p>
+        </div>
+      </details>
+      <details class="acc">
+        <summary>بخشِ «خدمات» و «پرسنل» چیکار می‌کنن؟</summary>
+        <div class="acc-body">
+          <p>از اینجا می‌شه خدمتِ جدید اضافه کرد، قیمت/مدت‌زمان/عکس‌هاشو ویرایش کرد، و مشخص کرد کدوم پرسنل اون خدمت رو انجام می‌ده. برایِ پرسنل هم ساعتِ کاریِ هفتگی از همینجا تنظیم می‌شه.</p>
+          <p class="callout" style="margin-top:10px;"><b>نکته‌ی مهم:</b> تغییرِ قیمت/توضیحِ یک خدمت تو پنل، فعلاً رویِ نمایشِ سایتِ عمومی اثر نداره — سایت هنوز یک نسخه‌ی جدا و ثابت از توضیحاتِ خدمات داره. این یکی از کارهایِ بازِ فنیه.</p>
+        </div>
+      </details>
+      <details class="acc">
+        <summary>فرقِ نقشِ «منشی» با «مدیر» چیه؟</summary>
+        <div class="acc-body">
+          <p>هر دو می‌تونن خدمت/پرسنل/نوبت/مشتری اضافه و ویرایش کنن. فقط حذفِ کامل (نه ویرایش) مخصوصِ نقشِ «ادمین»ه — این محدودیت عمدیه، برایِ جلوگیری از پاک‌شدنِ اشتباهیِ اطلاعات.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ===== برای دکتر فرناز ===== -->
+  <section class="panel" id="p-doctor">
+    <h2 class="lead">نمایِ صاحبِ کسب‌وکار</h2>
+    <p class="sub">همون پنلی که پذیرش استفاده می‌کنه، به‌علاوه‌ی دسترسیِ کامل و چندتا تصمیمِ کسب‌وکاری که هنوز منتظرِ نظرِ شماست.</p>
+
+    <div class="card" style="margin-bottom:16px;">
+      <h3 style="margin:0 0 8px;font-size:14.5px;">چه چیزی فقط دستِ شماست</h3>
+      <p style="margin:0;font-size:13.5px;color:var(--ink-soft);line-height:1.85;">حذفِ کاملِ یک خدمت، پرسنل، نوبت یا مشتری — تا هیچ‌کدوم از این‌ها با یک اشتباهِ کوچیک از بین نره، این کار فقط از حسابِ «ادمین» (حسابِ شما) قابلِ‌انجامه، نه از حسابِ منشی.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 10px;font-size:14.5px;">تصمیم‌هایی که منتظرِ شما هستن</h3>
+      <ol class="tasklist">
+        <li>قیمت و مدت‌زمانِ دقیقِ هر خدمت — تا وقتی اعلام نکنید، سایت همه‌جا «قیمت پس از مشاوره» نشون می‌ده.</li>
+        <li>روشِ فعلیِ حساب‌کتابِ کلینیک — برایِ طراحیِ ماژولِ حسابداریِ آینده، اول باید بدونیم الان با چی کار می‌کنید.</li>
+        <li>تأییدِ اینکه امتیازِ باشگاهِ مشتریان فقط از نوبت‌هایِ «انجام‌شده» حساب بشه (نه فقط ثبت‌شده).</li>
+      </ol>
+    </div>
+
+    <div class="callout">
+      <b>برایِ آینده:</b> یک نسخه‌ی «رزروِ آنلاینِ لحظه‌ای» (مشتری خودش ساعتِ خالیِ واقعی رو از تقویم انتخاب کنه) از قبل ساخته شده ولی عمداً خاموشه — چون با یک دکتر لازم نیست. هروقت دکترِ دوم اضافه شد یا حجمِ مشتری بالا رفت، با یک سوییچِ کوچیک روشن می‌شه، بدونِ نیاز به ساختِ دوباره.
+    </div>
+  </section>
+
+  <!-- ===== کارت NFC ===== -->
+  <section class="panel" id="p-card">
+    <h2 class="lead">کارتِ هوشمند چطور کار می‌کنه</h2>
+    <p class="sub">کارتِ فیزیکیِ لیانا یک تراشه‌ی NFC داره؛ وقتی پشتِ گوشی لمس می‌شه (بدونِ نیاز به اپ، فقط NFCِ گوشی روشن باشه)، مرورگر خودکار یک آدرس رو باز می‌کنه.</p>
+
+    <div class="grid2">
+      <div class="card">
+        <h3 style="margin:0 0 8px;font-size:14px;">برایِ اکثرِ مشتری‌ها</h3>
+        <p style="margin:0;font-size:13.5px;color:var(--ink-soft);line-height:1.85;">یک صفحه‌ی سبکِ معرفیِ کلینیک دیده می‌شه: اسم، خدمات، شبکه‌های اجتماعی، دکمه‌ی «درخواستِ مشاوره»، و یک دکمه‌ی «ورود به حسابِ مشتری».</p>
+      </div>
+      <div class="card">
+        <h3 style="margin:0 0 8px;font-size:14px;">برایِ مشتریِ لاگین‌شده</h3>
+        <p style="margin:0;font-size:13.5px;color:var(--ink-soft);line-height:1.85;">اگه رویِ همون گوشی قبلاً وارد پورتالش شده باشه، همون لحظه‌ی لمس مستقیم می‌ره تو پروفایلِ خودش (امتیاز/تاریخچه) — بدونِ دیدنِ صفحه‌ی معمولی، بدونِ لاگینِ دوباره.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px;">
+      <p style="margin:0;font-size:13.5px;color:var(--ink-soft);line-height:1.85;">نکته: این ریدایرکت فقط بر اساسِ خودِ گوشیه (کوکیِ ورود)، نه شناساییِ فردِ خاص از رویِ کارت. اگه مشتری از حسابش خارج بشه یا گوشیِ دیگه‌ای استفاده کنه، دوباره صفحه‌ی معمولی رو می‌بینه. از پروفایلِ خودش هم یک دکمه‌ی «مشاهده‌ی صفحه‌ی کارتِ ویزیت» هست، برایِ وقتی می‌خواد صفحه‌ی معمولی رو (مثلاً برایِ نشون‌دادن به یکی دیگه) دوباره ببینه.</p>
+    </div>
+  </section>
+
+  <!-- ===== وضعیت و نقشه‌راه ===== -->
+  <section class="panel" id="p-status">
+    <h2 class="lead">همین الان کجاییم</h2>
+    <p class="sub">یک گزارشِ صادقانه از چی زنده‌ست، چی ساخته شده ولی خاموشه، و چی هنوز مونده — بدونِ رنگ‌کردن.</p>
+
+    <div class="status-grid">
+      <div class="status-card">
+        <h3><span class="dot live"></span>زنده و در حالِ استفاده</h3>
+        <ul>
+          <li>سایتِ عمومی + فرمِ «درخواستِ مشاوره»</li>
+          <li>کارتِ NFC + ریدایرکتِ خودکار به پروفایل</li>
+          <li>پنلِ مدیریتِ خدمات و پرسنل</li>
+          <li>دفترچه‌ی نوبت‌هایِ دستی و پروفایلِ مشتری (CRM)</li>
+          <li>پورتالِ مشتری — امتیاز و تاریخچه‌ی نوبت‌ها</li>
+        </ul>
+      </div>
+      <div class="status-card">
+        <h3><span class="dot hidden-f"></span>ساخته شده، عمداً خاموش یا ناقص</h3>
+        <ul>
+          <li>رزروِ آنلاینِ لحظه‌ای — کدش آماده‌ست، منتظرِ رشدِ کلینیکه</li>
+          <li>پیامکِ واقعیِ ورودِ پورتال — فعلاً حالتِ تستی (کدِ ورود رویِ صفحه نشون داده می‌شه، نه پیامکِ واقعی)</li>
+          <li>محتوایِ خدماتِ سایت هنوز به دیتایِ پنل وصل نیست (سایت مستقل خونده می‌شه)</li>
+        </ul>
+      </div>
+      <div class="status-card">
+        <h3><span class="dot todo"></span>هنوز شروع نشده</h3>
+        <ul>
+          <li>داشبوردِ مدیریتی</li>
+          <li>ماژولِ حسابداری</li>
+          <li>خرجِ امتیازِ باشگاهِ مشتریان (فعلاً فقط شمارش می‌شه)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:16px;">
+      <b>منتظرِ تصمیمِ شماست:</b> قیمت/مدت‌زمانِ دقیقِ خدمات، متنِ دقیقِ نقاطِ عکسِ نمونه‌کار، و راه‌اندازیِ پیامکِ واقعی (که نیازِ یک مرحله‌ی احرازِ هویتِ اداری داره).
+    </div>
+  </section>
+
+</main>
+
+<footer>راهنمای داخلیِ پروژه‌ی لیانا — آخرین به‌روزرسانی: مهر ۱۴۰۵</footer>
+
+<script>
+(function(){
+  var tabs = document.querySelectorAll('#tabs button');
+  var panels = document.querySelectorAll('section.panel');
+  function show(id, push){
+    tabs.forEach(function(b){ b.classList.toggle('active', b.dataset.tab === id); });
+    panels.forEach(function(p){ p.classList.toggle('active', p.id === 'p-' + id); });
+    if(push){ try{ history.replaceState(null,'', '#' + id); }catch(e){} }
+    window.scrollTo({top:0, behavior:'instant' in window ? 'instant':'auto'});
+  }
+  tabs.forEach(function(b){ b.addEventListener('click', function(){ show(b.dataset.tab, true); }); });
+
+  var initial = (location.hash || '').replace('#','');
+  var valid = Array.prototype.map.call(tabs, function(b){ return b.dataset.tab; });
+  show(valid.indexOf(initial) > -1 ? initial : 'overview', false);
+
+  document.querySelectorAll('.copy-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var text = btn.getAttribute('data-copy');
+      function done(){
+        var old = btn.textContent;
+        btn.textContent = 'کپی شد';
+        btn.classList.add('done');
+        setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1400);
+      }
+      try{
+        navigator.clipboard.writeText(text).then(done, function(){
+          var ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta);
+          ta.select(); try{ document.execCommand('copy'); done(); }catch(e){} document.body.removeChild(ta);
+        });
+      }catch(e){
+        var ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta);
+        ta.select(); try{ document.execCommand('copy'); done(); }catch(err){} document.body.removeChild(ta);
+      }
+    });
+  });
+})();
+</script>
