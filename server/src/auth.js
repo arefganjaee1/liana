@@ -120,12 +120,13 @@ export function getSessionCustomer(token) {
   return customer;
 }
 
-// این کوکی باید هم رویِ panel.liana.arefprojects.ir و هم رویِ liana.arefprojects.ir (و card.liana.arefprojects.ir)
+// این کوکی باید هم رویِ panel.beautyliana.ir و هم رویِ beautyliana.ir (و card.beautyliana.ir)
 // خونده بشه — برایِ فیچرِ «کارتِ NFC رو بزن، اگه گوشیِ خودِ مشتریه خودکار برو تو پروفایلش».
-// چون panel.liana.arefprojects.ir زیردامنه‌یِ liana.arefprojects.ir‌ـه، اجازه داره کوکی رو برایِ اون دامنه ست کنه
+// چون panel.beautyliana.ir زیردامنه‌یِ beautyliana.ir‌ـه، اجازه داره کوکی رو برایِ اون دامنه ست کنه
 // و مرورگر خودکار رویِ همه‌یِ زیردامنه‌هاش (از‌جمله خودِ panel) اعمالش می‌کنه.
 // تویِ دولوپمنتِ لوکال Domain رو خالی می‌ذاریم که کوکی host-only بمونه و رویِ localhost/IP کار کنه.
-const CUSTOMER_COOKIE_DOMAIN = process.env.NODE_ENV === 'production' ? '; Domain=liana.arefprojects.ir' : '';
+// دامنه از env قابلِ تنظیمه (CUSTOMER_COOKIE_DOMAIN_NAME) تا یه مهاجرتِ دامنه‌ی بعدی فقط یه تغییرِ .env باشه، نه کد.
+const CUSTOMER_COOKIE_DOMAIN = process.env.NODE_ENV === 'production' ? `; Domain=${process.env.CUSTOMER_COOKIE_DOMAIN_NAME || 'beautyliana.ir'}` : '';
 
 export function setCustomerSessionCookie(res, token, expiresISO) {
   const expires = new Date(expiresISO).toUTCString();

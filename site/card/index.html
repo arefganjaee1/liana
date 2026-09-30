@@ -267,13 +267,13 @@
       function syncAccountButtonIfLoggedIn() {
         // فقط برایِ حالتِ بایپس صدا زده می‌شه: صفحه رو جابه‌جا نمی‌کنه، فقط اگه لاگین بود
         // متن/لینکِ دکمه‌ی پایینِ کارت رو از «ورود» به «بازگشت به حساب» عوض می‌کنه.
-        fetch('https://panel.liana.arefprojects.ir/api/customer/auth/me', { credentials: 'include' })
+        fetch('https://panel.beautyliana.ir/api/customer/auth/me', { credentials: 'include' })
           .then(function (r) { return r.ok ? r.json() : null; })
           .then(function (data) {
             if (data && data.ok) {
               var btn = document.getElementById('accountBtn');
               var label = document.getElementById('accountBtnLabel');
-              if (btn) btn.setAttribute('href', 'https://panel.liana.arefprojects.ir/portal/index.html');
+              if (btn) btn.setAttribute('href', 'https://panel.beautyliana.ir/portal/index.html');
               if (label) label.textContent = 'بازگشت به حساب مشتری';
             }
           })
@@ -281,12 +281,12 @@
       }
       if (bypass) { reveal(); syncAccountButtonIfLoggedIn(); return; }
       setTimeout(reveal, 1200); // فالبک: شبکه/سرور کند یا در دسترس نبود — بیشتر از این معطلِ کارت نمی‌مونیم
-      fetch('https://panel.liana.arefprojects.ir/api/customer/auth/me', { credentials: 'include' })
+      fetch('https://panel.beautyliana.ir/api/customer/auth/me', { credentials: 'include' })
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (data) {
           if (settled) return; // تایم‌اوت زودتر رسیده، دیگه دیره — کارت رو نگه‌دار، رو صفحه نپر
           if (data && data.ok) {
-            window.location.replace('https://panel.liana.arefprojects.ir/portal/index.html');
+            window.location.replace('https://panel.beautyliana.ir/portal/index.html');
           } else {
             reveal();
           }
@@ -360,7 +360,7 @@
           <span class="pending">تلگرام (به‌زودی)</span>
         </div>
         <div class="dock-item">
-          <a class="dock-icon glass-tint tap" aria-label="مشاهده‌ی سایتِ کامل" href="https://liana.arefprojects.ir">
+          <a class="dock-icon glass-tint tap" aria-label="مشاهده‌ی سایتِ کامل" href="https://beautyliana.ir">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 12a9 9 0 0 1 9-9m-9 9a9 9 0 0 0 9 9m0-18a9 9 0 0 1 9 9m-9-9c2.2 2.2 3.5 5.3 3.5 9s-1.3 6.8-3.5 9m0-18c-2.2 2.2-3.5 5.3-3.5 9s1.3 6.8 3.5 9m-9-9a9 9 0 0 0 9 9"/></svg>
           </a>
           <span>سایت</span>
@@ -375,7 +375,7 @@
 
       <a class="cta glass-tint tap" href="sms:+989332650382" style="text-decoration:none; display:flex; align-items:center; justify-content:center;">رزرو نوبت<span class="cta-note">با پیامک به همین شماره</span></a>
 
-      <a class="cta glass tap" id="accountBtn" href="https://panel.liana.arefprojects.ir/portal/login.html" style="color:var(--accent-dark); font-weight:700; text-decoration:none; display:flex; align-items:center; justify-content:center; margin-top:10px;">
+      <a class="cta glass tap" id="accountBtn" href="https://panel.beautyliana.ir/portal/login.html" style="color:var(--accent-dark); font-weight:700; text-decoration:none; display:flex; align-items:center; justify-content:center; margin-top:10px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="margin-inline-end:7px;"><circle cx="12" cy="8" r="3.3"/><path d="M5 20c0-3.9 3.1-6.5 7-6.5s7 2.6 7 6.5"/></svg>
         <span id="accountBtnLabel">ورود به حساب مشتری</span>
       </a>
@@ -447,7 +447,7 @@
     <h3 class="svc-sheet-title" id="svcSheetTitle">—</h3>
     <p class="svc-sheet-note">برای رزرو نوبتِ همین خدمت، پیامکِ آماده رو بفرست؛ برای توضیحاتِ کامل‌تر هم می‌تونی سر بزنی به سایت.</p>
     <a class="cta glass-tint tap" id="svcSheetSms" href="sms:+989332650382" style="text-decoration:none; display:flex; align-items:center; justify-content:center;">رزرو با پیامک</a>
-    <a class="svc-sheet-site tap" href="https://liana.arefprojects.ir/#services" target="_blank" rel="noopener">مشاهده در سایت ←</a>
+    <a class="svc-sheet-site tap" href="https://beautyliana.ir/#services" target="_blank" rel="noopener">مشاهده در سایت ←</a>
   </div>
 
   <script>
@@ -467,7 +467,7 @@
         `FN:${name}`, `ORG:${name}`,
         `TEL;TYPE=CELL,VOICE:${phone}`,
         `ADR;TYPE=WORK:;;${address};;;;`,
-        'URL:https://liana.arefprojects.ir',
+        'URL:https://beautyliana.ir',
         'END:VCARD',''
       ].join('\r\n');
       const blob = new Blob([vcard], { type: 'text/vcard;charset=utf-8' });
