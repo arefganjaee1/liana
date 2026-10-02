@@ -23,24 +23,28 @@ export function resolveCustomerId(phoneRaw, name) {
 }
 
 // لیست — با فیلترِ اختیاریِ یه روزِ خاص (?date=YYYY-MM-DD) یا یه بازه (?from=&to=)؛ بدونِ فیلتر یعنی همه، جدیدترین اول
+// فیلترِ اختیاریِ ?status= (pending/confirmed/done/cancelled) — برای صفحه‌ی «مشاوره» (درخواست‌هایِ در‌انتظار)،
+// قابلِ‌ترکیب با فیلترهایِ بالا؛ بدونِ این پارامتر رفتارِ قبلی دست‌نخورده می‌مونه.
 router.get('/', requireAuth(), (req, res) => {
-  const { date, from, to } = req.query;
+  const { date, from, to, status } = req.query;
+  const st = STATUSES.includes(status) ? status : null;
   let rows;
   if (date) {
     rows = db.prepare(`
-      SELECT * FROM bookings WHERE booking_date = ?
+      SELECT * FROM bookings WHERE booking_date = ? ${st ? 'AND status = ?' : ''}
       ORDER BY (booking_time IS NULL), booking_time, id
-    `).all(date);
+    `).all(...(st ? [date, st] : [date]));
   } else if (from && to) {
     rows = db.prepare(`
-      SELECT * FROM bookings WHERE booking_date BETWEEN ? AND ?
+      SELECT * FROM bookings WHERE booking_date BETWEEN ? AND ? ${st ? 'AND status = ?' : ''}
       ORDER BY booking_date, (booking_time IS NULL), booking_time, id
-    `).all(from, to);
+    `).all(...(st ? [from, to, st] : [from, to]));
   } else {
     rows = db.prepare(`
       SELECT * FROM bookings
+      ${st ? 'WHERE status = ?' : ''}
       ORDER BY booking_date DESC, (booking_time IS NULL), booking_time DESC, id DESC
-    `).all();
+    `).all(...(st ? [st] : []));
   }
   res.json({ ok: true, bookings: rows });
 });

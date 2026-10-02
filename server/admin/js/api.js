@@ -77,4 +77,33 @@ async function renderShell(activeKey, user) {
     await apiPost('/auth/logout', {});
     window.location.href = '/admin/login.html';
   });
+
+  // اعلانِ سادهِ درون‌پنلی: تعدادِ درخواست‌هایِ «در انتظارِ تایید» رو کنارِ لینکِ «مشاوره» نشون می‌ده —
+  // نه پیامک نه ایمیل، فقط همین که پنل رو باز کنی خودش به‌روزه؛ هر ۴۵ ثانیه هم تا وقتی تب بازه رفرش می‌شه.
+  updateConsultationBadge();
+  if (!window._consultBadgeTimer) {
+    window._consultBadgeTimer = setInterval(updateConsultationBadge, 45000);
+  }
+}
+
+async function updateConsultationBadge() {
+  const link = document.querySelector('.sidebar nav a[data-key="consultations"]');
+  if (!link) return;
+  try {
+    const { bookings } = await apiGet('/admin/bookings?status=pending');
+    const n = bookings.length;
+    let badge = link.querySelector('.nav-badge');
+    if (n > 0) {
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'nav-badge';
+        link.appendChild(badge);
+      }
+      badge.textContent = n > 99 ? '۹۹+' : String(n);
+    } else {
+      badge?.remove();
+    }
+  } catch (e) {
+    // یه اعلانِ کمکیه؛ اگه شکست خورد نباید کلِ پنل رو مختل کنه
+  }
 }

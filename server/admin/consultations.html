@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>نوبت‌ها — پنلِ مدیریتِ لیانا</title>
+<title>مشاوره — پنلِ مدیریتِ لیانا</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap">
 <link rel="stylesheet" href="css/admin.css">
@@ -31,54 +31,43 @@
     <div class="page-head">
       <div>
         <div class="eyebrow-label">پنلِ مدیریتِ لیانا</div>
-        <h1>نوبت‌ها</h1>
-        <div class="sub">رزروِ واقعی هنوز از طریقِ پیامک به گوشیِ کلینیک میاد؛ همین‌جا بعدِ هماهنگی با مشتری، نوبت رو ثبت کن.</div>
+        <h1>مشاوره</h1>
+        <div class="sub">درخواست‌هایی که مشتری‌ها از رویِ سایت فرستادن و هنوز تماس/تاییدِ نهایی نگرفتن. بعدِ تماس، از دکمه‌یِ «ویرایش» تاریخ/ساعتِ نهایی رو ثبت کن و وضعیت رو عوض کن — خودش از این لیست می‌ره.</div>
       </div>
-      <button class="btn btn-primary" id="addBookingBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg><span>ثبتِ نوبتِ جدید</span></button>
     </div>
 
     <div class="card">
       <div class="bookings-toolbar">
-        <button class="btn btn-ghost btn-sm tap" id="todayBtn">امروز</button>
-        <button class="btn btn-ghost btn-sm tap" id="allBtn">همه‌ی نوبت‌ها</button>
-        <div class="date-jump">
-          <div class="jpicker" id="dateJumpWrap">
-            <input type="text" id="dateJumpDisplay" class="jpicker-input" readonly autocomplete="off" placeholder="انتخاب تاریخ">
-            <input type="hidden" id="dateJumpInput">
-          </div>
-          <span class="jalali-echo" id="dateJumpEcho"></span>
-        </div>
-        <div class="spacer"></div>
         <span class="jalali-echo" id="listSummary"></span>
       </div>
 
-      <table class="table" id="bookingsTable">
+      <table class="table" id="consultTable">
         <thead>
           <tr>
             <th style="width:36px">#</th>
             <th>مشتری</th>
             <th>خدمت</th>
-            <th>پرسنل</th>
-            <th>تاریخ / ساعت</th>
+            <th>یادداشت / ترجیحِ زمانی</th>
+            <th>ثبت‌شده در</th>
             <th>وضعیت</th>
             <th></th>
           </tr>
         </thead>
-        <tbody id="bookingsBody"></tbody>
+        <tbody id="consultBody"></tbody>
       </table>
       <div class="empty-state" id="emptyState" style="display:none">
-        <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.2"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg></div>
-        <div id="emptyStateText">هنوز نوبتی برایِ این روز ثبت نشده.</div>
+        <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9l-4.6 3.3a.5.5 0 0 1-.9-.4V17.5a1 1 0 0 1-1-1v-10a1 1 0 0 1 1-1Z"/><path d="M8 10h8M8 13.3h5"/></svg></div>
+        <div>فعلاً هیچ درخواستِ مشاوره‌یِ در‌انتظاری نیست.</div>
       </div>
     </div>
   </main>
 </div>
 
-<!-- مودالِ افزودن/ویرایشِ نوبت -->
+<!-- مودالِ ویرایش/تاییدِ درخواست (دقیقاً هم‌ساختار با مودالِ صفحه‌یِ نوبت‌ها) -->
 <div class="modal-backdrop" id="bookingModalBackdrop" style="display:none">
   <div class="modal" style="max-width:560px">
-    <h2 id="bookingModalTitle">ثبتِ نوبتِ جدید</h2>
-    <p class="modal-sub">اطلاعاتِ نوبتی که با مشتری هماهنگ شده رو اینجا ثبت کن.</p>
+    <h2 id="bookingModalTitle">ویرایشِ درخواست</h2>
+    <p class="modal-sub">بعدِ هماهنگیِ تلفنی، تاریخ/ساعتِ نهایی و وضعیت رو اینجا ثبت کن.</p>
 
     <div class="row-2">
       <div class="field">
@@ -120,8 +109,8 @@
       <div class="field">
         <label>وضعیت</label>
         <select id="b_status">
-          <option value="confirmed">تایید شده</option>
           <option value="pending">در انتظارِ تایید</option>
+          <option value="confirmed">تایید شده</option>
           <option value="done">انجام شد</option>
           <option value="cancelled">لغو شده</option>
         </select>
@@ -143,6 +132,6 @@
 <script src="js/api.js"></script>
 <script src="js/jalali.js"></script>
 <script src="js/jalali-picker.js"></script>
-<script src="js/bookings.js"></script>
+<script src="js/consultations.js"></script>
 </body>
 </html>
