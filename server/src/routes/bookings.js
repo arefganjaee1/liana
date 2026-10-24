@@ -2,10 +2,27 @@ import { Router } from 'express';
 import { db } from '../db.js';
 import { requireAuth, WRITE_ROLES } from '../auth.js';
 import { normalizePhone } from '../phone.js';
+import { parseNumber, returnTreatmentStock, inTransaction } from '../inventory.js';
 
 const router = Router();
 
 const STATUSES = ['pending', 'confirmed', 'done', 'cancelled'];
+
+// ستون‌هایِ لیست + جمعِ پرداختی و تعدادِ ردیف‌هایِ پرونده‌ی درمان (برایِ پیلِ «مانده/تسویه» تو جدولِ نوبت‌ها)
+const LIST_SELECT = `
+  SELECT bookings.*,
+    (SELECT COALESCE(SUM(p.amount), 0) FROM payments p WHERE p.booking_id = bookings.id) AS paid_total,
+    (SELECT COUNT(*) FROM treatment_items t WHERE t.booking_id = bookings.id) AS treatment_count
+  FROM bookings`;
+
+// مبلغ: undefined = دست نزن، '' یا null = پاک کن، بقیه = عددِ صحیحِ تومان (ارقامِ فارسی و جداکننده قبوله)
+function parsePrice(v) {
+  if (v === undefined) return { skip: true };
+  if (v === null || v === '') return { value: null };
+  const n = parseNumber(v);
+  if (n === null || n < 0) return { error: 'مبلغِ نوبت باید یه عدد باشه (تومان)' };
+  return { value: Math.round(n) };
+}
 
 function fullBooking(id) {
   return db.prepare('SELECT * FROM bookings WHERE id = ?').get(id);
@@ -31,17 +48,17 @@ router.get('/', requireAuth(), (req, res) => {
   let rows;
   if (date) {
     rows = db.prepare(`
-      SELECT * FROM bookings WHERE booking_date = ? ${st ? 'AND status = ?' : ''}
+      ${LIST_SELECT} WHERE booking_date = ? ${st ? 'AND status = ?' : ''}
       ORDER BY (booking_time IS NULL), booking_time, id
     `).all(...(st ? [date, st] : [date]));
   } else if (from && to) {
     rows = db.prepare(`
-      SELECT * FROM bookings WHERE booking_date BETWEEN ? AND ? ${st ? 'AND status = ?' : ''}
+      ${LIST_SELECT} WHERE booking_date BETWEEN ? AND ? ${st ? 'AND status = ?' : ''}
       ORDER BY booking_date, (booking_time IS NULL), booking_time, id
     `).all(...(st ? [from, to, st] : [from, to]));
   } else {
     rows = db.prepare(`
-      SELECT * FROM bookings
+      ${LIST_SELECT}
       ${st ? 'WHERE status = ?' : ''}
       ORDER BY booking_date DESC, (booking_time IS NULL), booking_time DESC, id DESC
     `).all(...(st ? [st] : []));
@@ -57,6 +74,8 @@ router.get('/:id', requireAuth(), (req, res) => {
 
 router.post('/', requireAuth(WRITE_ROLES), (req, res) => {
   const { customer_name, customer_phone, service_id, service_title, staff_id, booking_date, booking_time, status, note } = req.body || {};
+  const priceIn = parsePrice(req.body?.price);
+  if (priceIn.error) return res.status(400).json({ ok: false, error: priceIn.error });
 
   if (!customer_name || !customer_name.trim()) return res.status(400).json({ ok: false, error: 'نامِ مشتری لازمه' });
   if (!booking_date || !/^\d{4}-\d{2}-\d{2}$/.test(booking_date)) return res.status(400).json({ ok: false, error: 'تاریخِ نوبت درست نیست' });
@@ -84,8 +103,8 @@ router.post('/', requireAuth(WRITE_ROLES), (req, res) => {
   const customerId = resolveCustomerId(finalPhone, finalName);
 
   const info = db.prepare(`
-    INSERT INTO bookings (customer_name, customer_phone, customer_id, service_id, service_title, staff_id, staff_name, booking_date, booking_time, status, note, created_by)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO bookings (customer_name, customer_phone, customer_id, service_id, service_title, staff_id, staff_name, booking_date, booking_time, status, note, created_by, price)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     finalName,
     finalPhone,
@@ -96,6 +115,7 @@ router.post('/', requireAuth(WRITE_ROLES), (req, res) => {
     st,
     note && note.trim() ? note.trim() : null,
     req.user.id,
+    priceIn.skip ? null : priceIn.value,
   );
   res.json({ ok: true, id: Number(info.lastInsertRowid), booking: fullBooking(Number(info.lastInsertRowid)) });
 });
@@ -106,6 +126,8 @@ router.put('/:id', requireAuth(WRITE_ROLES), (req, res) => {
   if (!existing) return res.status(404).json({ ok: false, error: 'نوبت پیدا نشد' });
 
   const { customer_name, customer_phone, service_id, service_title, staff_id, booking_date, booking_time, status, note } = req.body || {};
+  const priceIn = parsePrice(req.body?.price);
+  if (priceIn.error) return res.status(400).json({ ok: false, error: priceIn.error });
 
   if (booking_date !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(booking_date)) {
     return res.status(400).json({ ok: false, error: 'تاریخِ نوبت درست نیست' });
@@ -152,7 +174,7 @@ router.put('/:id', requireAuth(WRITE_ROLES), (req, res) => {
   db.prepare(`
     UPDATE bookings SET
       customer_name = ?, customer_phone = ?, customer_id = ?, service_id = ?, service_title = ?, staff_id = ?, staff_name = ?,
-      booking_date = ?, booking_time = ?, status = ?, note = ?, updated_at = datetime('now')
+      booking_date = ?, booking_time = ?, status = ?, note = ?, price = ?, updated_at = datetime('now')
     WHERE id = ?
   `).run(
     finalName,
@@ -163,6 +185,7 @@ router.put('/:id', requireAuth(WRITE_ROLES), (req, res) => {
     booking_time !== undefined ? (booking_time && booking_time.trim() ? booking_time.trim() : null) : existing.booking_time,
     st,
     note !== undefined ? (note && note.trim() ? note.trim() : null) : existing.note,
+    priceIn.skip ? existing.price : priceIn.value,
     id,
   );
   res.json({ ok: true, booking: fullBooking(id) });
@@ -171,7 +194,11 @@ router.put('/:id', requireAuth(WRITE_ROLES), (req, res) => {
 // حذفِ کاملِ یه نوبت — فقط ادمین (منیجر می‌تونه به‌جاش وضعیت رو «لغوشده» کنه، همون الگویِ حذفِ خدمات/پرسنل)
 router.delete('/:id', requireAuth('admin'), (req, res) => {
   const id = Number(req.params.id);
-  db.prepare('DELETE FROM bookings WHERE id = ?').run(id);
+  // موادی که تو پرونده‌ی این نوبت از انبار کم شده بودن، برمی‌گردن. پرداخت‌ها پاک نمی‌شن (فقط از نوبت جدا می‌شن).
+  inTransaction(() => {
+    db.prepare('SELECT * FROM treatment_items WHERE booking_id = ?').all(id).forEach((item) => returnTreatmentStock(item, req.user.id));
+    db.prepare('DELETE FROM bookings WHERE id = ?').run(id);
+  });
   res.json({ ok: true });
 });
 

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { db } from '../db.js';
 import { requireAuth, WRITE_ROLES } from '../auth.js';
 import { normalizePhone } from '../phone.js';
+import { portalInfo, activatePortal, disablePortal } from '../portalAccess.js';
 
 const router = Router();
 
@@ -15,7 +16,23 @@ function fullCustomer(id) {
     FROM bookings WHERE customer_id = ?
     ORDER BY booking_date DESC, (booking_time IS NULL), booking_time DESC, id DESC
   `).all(id);
-  return { ...c, bookings };
+  return { ...c, bookings, portal: portalInfo(id), finance: customerFinance(id), treatments: customerTreatments(id) };
+}
+
+// حسابِ مشتری: جمعِ مبلغِ نوبت‌هایِ لغونشده منهایِ همه‌ی پرداخت‌هاش. مثبت = بدهکار، منفی = بستانکار
+function customerFinance(id) {
+  const total = db.prepare(`SELECT COALESCE(SUM(price), 0) AS s FROM bookings WHERE customer_id = ? AND status != 'cancelled' AND price IS NOT NULL`).get(id).s;
+  const paid = db.prepare('SELECT COALESCE(SUM(amount), 0) AS s FROM payments WHERE customer_id = ?').get(id).s;
+  return { total_price: total, total_paid: paid, balance: total - paid };
+}
+
+function customerTreatments(id) {
+  return db.prepare(`
+    SELECT t.id, t.product_name, t.quantity, t.unit, t.area, t.lot_number, t.expiry_date, t.note, b.booking_date, b.id AS booking_id
+    FROM treatment_items t JOIN bookings b ON b.id = t.booking_id
+    WHERE t.customer_id = ?
+    ORDER BY b.booking_date DESC, t.id DESC LIMIT 100
+  `).all(id);
 }
 
 function cleanText(v) {
@@ -44,7 +61,9 @@ router.get('/', requireAuth(), (req, res) => {
     rows = db.prepare(`
       SELECT c.*,
         (SELECT COUNT(*) FROM bookings b WHERE b.customer_id = c.id) AS visit_count,
-        (SELECT MAX(booking_date) FROM bookings b WHERE b.customer_id = c.id) AS last_visit_date
+        (SELECT MAX(booking_date) FROM bookings b WHERE b.customer_id = c.id) AS last_visit_date,
+        (SELECT COALESCE(SUM(price), 0) FROM bookings b WHERE b.customer_id = c.id AND b.status != 'cancelled' AND b.price IS NOT NULL)
+          - (SELECT COALESCE(SUM(amount), 0) FROM payments p WHERE p.customer_id = c.id) AS balance
       FROM customers c
       WHERE c.name LIKE ? OR c.phone LIKE ?
       ORDER BY c.name COLLATE NOCASE
@@ -53,7 +72,9 @@ router.get('/', requireAuth(), (req, res) => {
     rows = db.prepare(`
       SELECT c.*,
         (SELECT COUNT(*) FROM bookings b WHERE b.customer_id = c.id) AS visit_count,
-        (SELECT MAX(booking_date) FROM bookings b WHERE b.customer_id = c.id) AS last_visit_date
+        (SELECT MAX(booking_date) FROM bookings b WHERE b.customer_id = c.id) AS last_visit_date,
+        (SELECT COALESCE(SUM(price), 0) FROM bookings b WHERE b.customer_id = c.id AND b.status != 'cancelled' AND b.price IS NOT NULL)
+          - (SELECT COALESCE(SUM(amount), 0) FROM payments p WHERE p.customer_id = c.id) AS balance
       FROM customers c
       ORDER BY c.name COLLATE NOCASE
     `).all();
@@ -137,6 +158,25 @@ router.put('/:id', requireAuth(WRITE_ROLES), (req, res) => {
     id,
   );
   res.json({ ok: true, customer: fullCustomer(id) });
+});
+
+// فعال‌سازی / ریستِ رمزِ ورود به پروفایلِ آنلاین — هر دو یه کارن (رمز → ۱۲۳۴۵۶، مهلتِ ۱۵ دقیقه، بستنِ سشن‌هایِ قبلی)
+router.post('/:id/portal/activate', requireAuth(WRITE_ROLES), (req, res) => {
+  const id = Number(req.params.id);
+  const c = db.prepare('SELECT id, phone FROM customers WHERE id = ?').get(id);
+  if (!c) return res.status(404).json({ ok: false, error: 'مشتری پیدا نشد' });
+  if (!c.phone) return res.status(400).json({ ok: false, error: 'برایِ فعال‌سازیِ ورود، اول شماره‌ی موبایلِ مشتری رو ثبت کن.' });
+  activatePortal(id, req.user.id);
+  res.json({ ok: true, portal: portalInfo(id) });
+});
+
+// غیرفعال‌کردنِ ورود — مشتری دیگه نمی‌تونه وارد بشه و از همه‌ی دستگاه‌ها خارج می‌شه
+router.post('/:id/portal/disable', requireAuth(WRITE_ROLES), (req, res) => {
+  const id = Number(req.params.id);
+  const c = db.prepare('SELECT id FROM customers WHERE id = ?').get(id);
+  if (!c) return res.status(404).json({ ok: false, error: 'مشتری پیدا نشد' });
+  disablePortal(id);
+  res.json({ ok: true, portal: portalInfo(id) });
 });
 
 // حذفِ کاملِ پروفایلِ مشتری — فقط ادمین (نوبت‌های قبلیِ این مشتری حذف نمی‌شن، فقط customer_id شون NULL می‌شه — تاریخچه دست‌نخورده می‌مونه)

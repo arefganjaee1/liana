@@ -12,6 +12,11 @@ async function init() {
     window.location.href = '/portal/login.html';
     return;
   }
+  // با رمزِ پیش‌فرض وارد شده و هنوز رمزِ خودش رو نذاشته — اوّل باید رمز تعیین کنه
+  if (data.must_change) {
+    window.location.replace('/portal/set-password.html');
+    return;
+  }
 
   document.getElementById('customerName').textContent = data.customer.name;
   document.getElementById('pointsNum').textContent = faDigits(data.points);

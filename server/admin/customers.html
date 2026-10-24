@@ -17,7 +17,9 @@
       <a href="/admin/services.html" data-key="services"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="7" rx="1.6"/><rect x="14" y="4" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6" opacity=".45"/><rect x="14" y="14" width="7" height="7" rx="1.6"/></svg><span>خدمات</span></a>
       <a href="/admin/bookings.html" data-key="bookings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.2"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg><span>نوبت‌ها</span></a>
       <a href="/admin/customers.html" data-key="customers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.2"/><circle cx="9" cy="11" r="2.3"/><path d="M5.5 16c.5-2 2-3 3.5-3s3 1 3.5 3"/><path d="M15 10h4M15 13.5h4"/></svg><span>مشتریان</span></a>
+      <a href="/admin/inventory.html" data-key="inventory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/></svg><span>انبار</span></a>
       <a href="/admin/staff.html" data-key="staff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M2.5 20c0-3.6 2.9-6.2 6.5-6.2s6.5 2.6 6.5 6.2"/><circle cx="17.5" cy="9" r="2.3"/><path d="M16 13.4c2.6.2 4.9 2.2 4.9 5.4"/></svg><span>پرسنل</span></a>
+      <a href="/admin/backups.html" data-key="backups" data-admin-only="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="7" ry="2.6"/><path d="M5 6v6c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6V6"/><path d="M5 12v6c0 1.4 3.1 2.6 7 2.6"/><path d="M17.5 14.5v6M15 18l2.5 2.5L20 18"/></svg><span>بک‌آپ</span></a>
     </nav>
     <div class="spacer"></div>
     <div class="user-box">
@@ -55,6 +57,7 @@
             <th>تلفن</th>
             <th>تعدادِ نوبت</th>
             <th>آخرین مراجعه</th>
+            <th>حساب</th>
             <th>رضایتِ عکس</th>
             <th></th>
           </tr>
@@ -138,6 +141,25 @@
         <label>یادداشتِ عمومی</label>
         <textarea id="c_notes" placeholder="هر نکته‌ی دیگه‌ای"></textarea>
       </div>
+    </div>
+
+    <div id="c_portal_section" class="portal-access" hidden>
+      <div class="section-title">ورود به پروفایلِ آنلاین <span class="pill" id="c_portal_pill"></span></div>
+      <p class="portal-access-text" id="c_portal_text"></p>
+      <div class="portal-access-actions">
+        <button class="btn btn-primary btn-sm" id="c_portal_activate" type="button"></button>
+        <button class="btn btn-ghost btn-sm" id="c_portal_disable" type="button">غیرفعال‌کردن</button>
+      </div>
+    </div>
+
+    <div id="c_fin_section" class="portal-access" hidden>
+      <div class="section-title">حساب و سوابقِ درمان <span class="pill" id="c_fin_pill"></span></div>
+      <p class="portal-access-text" id="c_fin_text"></p>
+      <div class="table-scroll"><table class="table" id="c_treat_table">
+        <thead><tr><th>تاریخ</th><th>محصول / کار</th><th>مقدار</th><th>ناحیه</th><th>سری / انقضا</th></tr></thead>
+        <tbody id="c_treat_body"></tbody>
+      </table></div>
+      <div class="hint" id="c_treat_empty" style="display:none; padding:6px 0;">هنوز درمانی تو پرونده‌ی این مشتری ثبت نشده. از صفحه‌ی «نوبت‌ها» → «پرونده» ثبت می‌شه.</div>
     </div>
 
     <div id="c_history_section" style="display:none">

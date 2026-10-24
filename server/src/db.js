@@ -14,6 +14,7 @@ const dbPath = process.env.DB_PATH
   ? path.resolve(process.cwd(), process.env.DB_PATH)
   : path.join(dataDir, 'liana.db');
 
+export const dbFilePath = dbPath;
 export const db = new DatabaseSync(dbPath);
 db.exec('PRAGMA journal_mode = WAL;');
 db.exec('PRAGMA foreign_keys = ON;');
@@ -171,6 +172,115 @@ db.exec(`
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     expires_at TEXT NOT NULL
   );
+
+  -- ===== ERP فازِ ۱: انبار، پرونده‌ی درمان، پرداخت =====
+
+  -- محصولاتِ انبار (بوتاکس، فیلر، مواد مصرفی…). unit همون واحدیه که هم خرید هم مصرف باهاش ثبت می‌شه
+  -- (مثلاً بوتاکس «واحد»: خریدِ یه ویالِ ۱۰۰ واحدی = ۱۰۰). حذف نمی‌شن، فقط غیرفعال.
+  CREATE TABLE IF NOT EXISTS inventory_products (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    brand TEXT,
+    category TEXT NOT NULL DEFAULT 'other',    -- 'toxin' | 'filler' | 'skinbooster' | 'consumable' | 'other'
+    unit TEXT NOT NULL DEFAULT 'عدد',
+    low_stock_threshold REAL,                  -- NULL = هشدارِ کم‌شدن نده
+    active INTEGER NOT NULL DEFAULT 1,
+    notes TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  -- هر خرید = یه سری (lot) با شماره‌ی سری و انقضایِ خودش؛ مصرف از سری‌ها کم می‌شه
+  CREATE TABLE IF NOT EXISTS inventory_lots (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    product_id INTEGER NOT NULL REFERENCES inventory_products(id) ON DELETE CASCADE,
+    lot_number TEXT,
+    expiry_date TEXT,                          -- 'YYYY-MM-DD' میلادی
+    quantity_received REAL NOT NULL,
+    quantity_remaining REAL NOT NULL,
+    unit_cost INTEGER,                         -- تومان به‌ازایِ هر واحد (اختیاری)
+    supplier TEXT,
+    received_at TEXT NOT NULL,                 -- 'YYYY-MM-DD'
+    note TEXT,
+    created_by INTEGER REFERENCES admin_users(id) ON DELETE SET NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_lots_product ON inventory_lots(product_id);
+
+  -- دفترِ همه‌ی ورود/خروج‌هایِ انبار (مثبت = ورود، منفی = خروج)
+  CREATE TABLE IF NOT EXISTS inventory_movements (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    product_id INTEGER NOT NULL REFERENCES inventory_products(id) ON DELETE CASCADE,
+    lot_id INTEGER REFERENCES inventory_lots(id) ON DELETE SET NULL,
+    change REAL NOT NULL,
+    reason TEXT NOT NULL,                      -- 'purchase' | 'treatment' | 'treatment_undo' | 'adjust' | 'waste'
+    treatment_item_id INTEGER,
+    note TEXT,
+    created_by INTEGER REFERENCES admin_users(id) ON DELETE SET NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_movements_product ON inventory_movements(product_id);
+
+  -- پرونده‌ی درمانِ هر نوبت: هر ردیف یه محصولِ مصرف‌شده (یا یه کارِ بدونِ محصول، مثلِ RF).
+  -- اسمِ محصول/شماره‌ی سری/انقضا snapshot می‌شن تا پرونده‌ی پزشکی با تغییرِ انبار عوض نشه.
+  CREATE TABLE IF NOT EXISTS treatment_items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    booking_id INTEGER NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
+    customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL,
+    product_id INTEGER REFERENCES inventory_products(id) ON DELETE SET NULL,
+    product_name TEXT,
+    lot_id INTEGER REFERENCES inventory_lots(id) ON DELETE SET NULL,
+    lot_number TEXT,
+    expiry_date TEXT,
+    quantity REAL,
+    unit TEXT,
+    deducted INTEGER NOT NULL DEFAULT 0,       -- ۱ = از انبار کم شده
+    area TEXT,                                 -- ناحیه (پیشانی، لب، …)
+    note TEXT,
+    created_by INTEGER REFERENCES admin_users(id) ON DELETE SET NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_treatment_booking ON treatment_items(booking_id);
+  CREATE INDEX IF NOT EXISTS idx_treatment_customer ON treatment_items(customer_id);
+
+  -- پرداخت‌ها — با حذفِ نوبت پاک نمی‌شن (رکوردِ پول می‌مونه)
+  CREATE TABLE IF NOT EXISTS payments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    booking_id INTEGER REFERENCES bookings(id) ON DELETE SET NULL,
+    customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL,
+    amount INTEGER NOT NULL,                   -- تومان؛ بازپرداخت منفی ذخیره می‌شه
+    method TEXT NOT NULL,                      -- 'cash' | 'card' | 'transfer'
+    kind TEXT NOT NULL DEFAULT 'payment',      -- 'payment' | 'deposit' | 'refund'
+    paid_at TEXT NOT NULL,                     -- 'YYYY-MM-DD'
+    note TEXT,
+    created_by INTEGER REFERENCES admin_users(id) ON DELETE SET NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_payments_booking ON payments(booking_id);
+  CREATE INDEX IF NOT EXISTS idx_payments_customer ON payments(customer_id);
+  CREATE INDEX IF NOT EXISTS idx_payments_date ON payments(paid_at);
+
+  -- شمارشِ تلاش‌هایِ اشتباهِ ورودِ پنل، به‌ازایِ «نام‌کاربری + IP» — ۵ اشتباه = ۱۵ دقیقه قفل (src/routes/auth.js)
+  CREATE TABLE IF NOT EXISTS admin_login_attempts (
+    attempt_key TEXT PRIMARY KEY,              -- 'username|ip'
+    failed INTEGER NOT NULL DEFAULT 0,
+    locked_until TEXT,
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  -- دسترسیِ مشتری به پروفایلِ آنلاین با رمز (جایگزینِ موقتِ ورودِ پیامکی) — منطقش تو src/portalAccess.js
+  -- عمداً جدا از customers تا هشِ رمز هیچ‌وقت با SELECT * روت‌هایِ پنل به مرورگر نرسه. نبودنِ ردیف = غیرفعال.
+  CREATE TABLE IF NOT EXISTS customer_portal_access (
+    customer_id INTEGER PRIMARY KEY REFERENCES customers(id) ON DELETE CASCADE,
+    status TEXT NOT NULL DEFAULT 'pending',    -- 'pending' (رمزِ پیش‌فرض، منتظرِ تعیینِ رمز) | 'active'
+    password_hash TEXT,
+    password_salt TEXT,
+    activation_expires_at TEXT,                -- فقط تو pending: تا کِی رمزِ پیش‌فرض قبوله (ISO)
+    failed_attempts INTEGER NOT NULL DEFAULT 0,
+    locked_until TEXT,                         -- ISO؛ بعد از ۵ تلاشِ اشتباه
+    activated_by INTEGER REFERENCES admin_users(id) ON DELETE SET NULL,
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
 `);
 
 // مایگریشنِ دستیِ ستونِ جدید رو دیتابیس‌های قدیمی‌تر — CREATE TABLE IF NOT EXISTS ستونِ جدید به جدولِ ازقبل‌موجود اضافه نمی‌کنه
@@ -186,7 +296,12 @@ if (!bookingsCols.includes('duration_minutes')) {
   db.exec(`ALTER TABLE bookings ADD COLUMN duration_minutes INTEGER;`);
 }
 
-const SCHEMA_VERSION = '4';
+// مبلغِ نهاییِ هر نوبت (تومان) — NULL یعنی هنوز تعیین نشده (ERP فازِ ۱)
+if (!bookingsCols.includes('price')) {
+  db.exec(`ALTER TABLE bookings ADD COLUMN price INTEGER;`);
+}
+
+const SCHEMA_VERSION = '7';
 const row = db.prepare('SELECT value FROM _meta WHERE key = ?').get('schema_version');
 if (!row) {
   db.prepare('INSERT INTO _meta (key, value) VALUES (?, ?)').run('schema_version', SCHEMA_VERSION);

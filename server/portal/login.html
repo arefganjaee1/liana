@@ -48,28 +48,23 @@
 
     <div class="card">
       <p class="eyebrow-label">پروفایلِ مشتری</p>
-      <h1 id="stepTitle">ورود با شماره‌ی تلفن</h1>
-      <p class="sub" id="stepSub">همون شماره‌ای که موقعِ نوبت‌گیری دادی رو وارد کن تا کدِ ورود برات پیامک بشه.</p>
+      <h1>ورود به پروفایل</h1>
+      <p class="sub">با همون شماره‌ای که تو کلینیک ثبت کردی وارد شو. بارِ اوّل، پذیرشِ کلینیک حسابت رو فعال می‌کنه و رمزِ اوّلیه رو بهت می‌گه.</p>
 
       <div class="msg" id="msgBox"></div>
 
-      <div id="stepPhone">
+      <form id="loginForm" novalidate>
         <div class="field">
-          <label>شماره‌ی موبایل</label>
+          <label for="phoneInput">شماره‌ی موبایل</label>
           <input type="tel" id="phoneInput" inputmode="numeric" placeholder="09xxxxxxxxx" autocomplete="tel" dir="ltr">
         </div>
-        <button class="btn" id="sendCodeBtn">دریافتِ کد</button>
-      </div>
-
-      <div id="stepCode" hidden>
         <div class="field">
-          <label>کدِ پیامک‌شده</label>
-          <input type="text" id="codeInput" inputmode="numeric" maxlength="5" placeholder="•••••" autocomplete="one-time-code" dir="ltr">
+          <label for="passwordInput">رمز</label>
+          <input type="password" id="passwordInput" autocomplete="current-password" dir="ltr">
         </div>
-        <button class="btn" id="verifyBtn">تأیید و ورود</button>
-        <button class="btn ghost" id="backBtn">تغییرِ شماره</button>
-        <p class="hint">کد نیومد؟ <button id="resendBtn">دوباره ارسال کن</button></p>
-      </div>
+        <button class="btn" id="loginBtn" type="submit">ورود</button>
+      </form>
+      <p class="hint">رمزت یادت رفته؟ از پذیرشِ کلینیک بخواه ریستش کنه.</p>
     </div>
   </div>
 

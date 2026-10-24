@@ -17,6 +17,8 @@ async function init() {
   document.getElementById('closeCustomerModalBtn').addEventListener('click', closeModal);
   document.getElementById('saveCustomerBtn').addEventListener('click', saveCustomer);
   document.getElementById('c_referral').addEventListener('change', onReferralChange);
+  document.getElementById('c_portal_activate').addEventListener('click', activatePortalAccess);
+  document.getElementById('c_portal_disable').addEventListener('click', disablePortalAccess);
   LianaJalaliPicker.attach(document.getElementById('c_birthday_display'), document.getElementById('c_birthday'));
   document.getElementById('searchInput').addEventListener('input', (e) => {
     clearTimeout(SEARCH_TIMER);
@@ -57,6 +59,7 @@ async function loadCustomers(q) {
       <td style="direction:ltr; text-align:right; font-variant-numeric:tabular-nums">${c.phone ? escapeHtml(c.phone) : '—'}</td>
       <td style="font-variant-numeric:tabular-nums">${LianaJalali.faDigits(c.visit_count || 0)}</td>
       <td>${c.last_visit_date ? LianaJalali.isoToJalaliDisplay(c.last_visit_date) : '—'}</td>
+      <td>${balancePill(c.balance)}</td>
       <td><span class="pill ${consentClass}">${consentLabel}</span></td>
       <td style="white-space:nowrap">
         <button class="btn btn-ghost btn-sm editBtn">${ICON.edit}<span>ویرایش</span></button>
@@ -69,6 +72,43 @@ async function loadCustomers(q) {
     });
     tr.querySelector('.delBtn')?.addEventListener('click', () => deleteCustomer(c.id, c.name));
     tbody.appendChild(tr);
+  });
+}
+
+// مانده‌ی حساب: مثبت = بدهکار، منفی = بستانکار (اضافه پرداخت/بیعانه‌ی استفاده‌نشده)
+function balancePill(bal) {
+  if (!bal) return '<span style="color:var(--ink-3)">—</span>';
+  if (bal > 0) return `<span class="pill st-pending">بدهکار ${Number(bal).toLocaleString('fa-IR')}</span>`;
+  return `<span class="pill pc-yes">بستانکار ${Number(-bal).toLocaleString('fa-IR')}</span>`;
+}
+
+function renderFinance(c) {
+  const sec = document.getElementById('c_fin_section');
+  sec.hidden = false;
+  const f = c.finance || { total_price: 0, total_paid: 0, balance: 0 };
+  const pill = document.getElementById('c_fin_pill');
+  if (f.balance > 0) { pill.className = 'pill st-pending'; pill.textContent = 'بدهکار'; }
+  else if (f.balance < 0) { pill.className = 'pill pc-yes'; pill.textContent = 'بستانکار'; }
+  else { pill.className = 'pill pc-unknown'; pill.textContent = 'تسویه'; }
+  const fa = (n) => Number(n).toLocaleString('fa-IR');
+  document.getElementById('c_fin_text').innerHTML = f.total_price || f.total_paid
+    ? `جمعِ مبلغِ نوبت‌ها <b>${fa(f.total_price)}</b>، پرداختی <b>${fa(f.total_paid)}</b>، ${f.balance > 0 ? `مانده <b>${fa(f.balance)}</b> تومان` : f.balance < 0 ? `<b>${fa(-f.balance)}</b> تومان بیشتر پرداخت کرده` : 'حساب صافه'}`
+    : 'هنوز مبلغ یا پرداختی برایِ این مشتری ثبت نشده.';
+
+  const body = document.getElementById('c_treat_body');
+  body.innerHTML = '';
+  const list = c.treatments || [];
+  document.getElementById('c_treat_empty').style.display = list.length ? 'none' : 'block';
+  document.getElementById('c_treat_table').style.display = list.length ? '' : 'none';
+  list.forEach((t) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${LianaJalali.isoToJalaliDisplay(t.booking_date)}</td>
+      <td>${escapeHtml(t.product_name)}</td>
+      <td style="font-variant-numeric:tabular-nums">${t.quantity !== null ? `${fmtQty(t.quantity)} ${escapeHtml(t.unit || '')}` : '—'}</td>
+      <td>${escapeHtml(t.area || '—')}</td>
+      <td><span dir="ltr">${escapeHtml(t.lot_number || '—')}</span>${t.expiry_date ? `<br><span style="font-size:11px; color:var(--ink-3)">${LianaJalali.isoToJalaliDisplay(t.expiry_date)}</span>` : ''}</td>`;
+    body.appendChild(tr);
   });
 }
 
@@ -142,11 +182,84 @@ function openModal(c) {
 
   if (c) {
     renderHistory(c.bookings || []);
+    renderPortal(c.portal, c.phone);
+    renderFinance(c);
   } else {
+    document.getElementById('c_fin_section').hidden = true;
     document.getElementById('c_history_section').style.display = 'none';
+    document.getElementById('c_portal_section').hidden = true;
   }
 
   document.getElementById('customerModalBackdrop').style.display = 'flex';
+}
+
+// ===== ورود به پروفایلِ آنلاین (رمزِ پیش‌فرضِ ۱۲۳۴۵۶ با مهلتِ ۱۵ دقیقه) =====
+function faTime(iso) {
+  return new Date(iso).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
+}
+
+function renderPortal(portal, phone) {
+  const section = document.getElementById('c_portal_section');
+  const pill = document.getElementById('c_portal_pill');
+  const text = document.getElementById('c_portal_text');
+  const actBtn = document.getElementById('c_portal_activate');
+  const disBtn = document.getElementById('c_portal_disable');
+  section.hidden = false;
+  const p = portal || { status: 'inactive' };
+
+  actBtn.disabled = !phone;
+  disBtn.style.display = p.status === 'inactive' ? 'none' : '';
+
+  if (!phone) {
+    pill.className = 'pill pc-unknown'; pill.textContent = 'غیرفعال';
+    text.innerHTML = 'برایِ فعال‌سازیِ ورود، اول شماره‌ی موبایلِ مشتری رو ثبت و ذخیره کن.';
+    actBtn.textContent = 'فعال‌سازی';
+    return;
+  }
+
+  let msg = '';
+  if (p.status === 'inactive') {
+    pill.className = 'pill pc-unknown'; pill.textContent = 'غیرفعال';
+    msg = 'مشتری هنوز نمی‌تونه وارد پروفایلش بشه. وقتی کنارِ شماست «فعال‌سازی» رو بزن و بهش بگو با شماره‌ش و رمزِ <b>۱۲۳۴۵۶</b> وارد بشه. همون اوّل ازش خواسته می‌شه رمزِ خودش رو بذاره. رمزِ پیش‌فرض فقط ۱۵ دقیقه معتبره.';
+    actBtn.textContent = 'فعال‌سازی';
+  } else if (p.status === 'pending') {
+    pill.className = 'pill st-pending'; pill.textContent = 'منتظرِ تعیینِ رمز';
+    msg = `رمزِ <b>۱۲۳۴۵۶</b> تا ساعتِ <b>${faTime(p.activation_expires_at)}</b> معتبره. اگه مشتری تا اون موقع وارد نشه و رمزش رو نذاره، باید دوباره فعالش کنی.`;
+    actBtn.textContent = 'فعال‌سازیِ دوباره';
+  } else if (p.status === 'expired') {
+    pill.className = 'pill pc-no'; pill.textContent = 'مهلت تموم شد';
+    msg = 'مهلتِ ۱۵ دقیقه‌ای گذشت و رمزِ پیش‌فرض دیگه کار نمی‌کنه. برایِ ورودِ مشتری، دوباره فعالش کن.';
+    actBtn.textContent = 'فعال‌سازیِ دوباره';
+  } else {
+    pill.className = 'pill pc-yes'; pill.textContent = 'فعال';
+    msg = 'مشتری رمزِ خودش رو گذاشته و کسی جز خودش اون رو نمی‌دونه. اگه رمزش یادش رفت، «ریستِ رمز» رو بزن: رمز برمی‌گرده به <b>۱۲۳۴۵۶</b> و ۱۵ دقیقه وقت داره عوضش کنه.';
+    actBtn.textContent = 'ریستِ رمز';
+  }
+  if (p.locked_until) {
+    msg += ` <br>به‌خاطرِ چند تلاشِ اشتباه، ورود تا ساعتِ <b>${faTime(p.locked_until)}</b> قفله. فعال‌سازی یا ریست قفل رو هم باز می‌کنه.`;
+  }
+  text.innerHTML = msg;
+}
+
+async function activatePortalAccess() {
+  if (!CURRENT_EDIT_ID) return;
+  const pillText = document.getElementById('c_portal_pill').textContent;
+  if (pillText === 'فعال' && !confirm('رمزِ این مشتری ریست بشه؟ رمزِ فعلیش باطل می‌شه، از همه‌ی دستگاه‌ها خارج می‌شه، و ۱۵ دقیقه وقت داره با ۱۲۳۴۵۶ وارد بشه و رمزِ جدید بذاره.')) return;
+  try {
+    const { portal } = await apiPost(`/admin/customers/${CURRENT_EDIT_ID}/portal/activate`, {});
+    renderPortal(portal, document.getElementById('c_phone').value.trim());
+    toast('فعال شد — رمزِ ۱۲۳۴۵۶ تا ۱۵ دقیقه معتبره');
+  } catch (e) { toast(e.message, true); }
+}
+
+async function disablePortalAccess() {
+  if (!CURRENT_EDIT_ID) return;
+  if (!confirm('ورودِ این مشتری به پروفایلِ آنلاین غیرفعال بشه؟ از همه‌ی دستگاه‌ها خارج می‌شه.')) return;
+  try {
+    const { portal } = await apiPost(`/admin/customers/${CURRENT_EDIT_ID}/portal/disable`, {});
+    renderPortal(portal, document.getElementById('c_phone').value.trim());
+    toast('ورود غیرفعال شد');
+  } catch (e) { toast(e.message, true); }
 }
 
 function closeModal() {

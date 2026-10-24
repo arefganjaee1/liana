@@ -29,6 +29,7 @@ async function init() {
   document.getElementById('saveBookingBtn').addEventListener('click', saveBooking);
   document.getElementById('b_service').addEventListener('change', onServiceSelectChange);
   LianaJalaliPicker.attach(document.getElementById('b_date_display'), document.getElementById('b_date'));
+  attachMoneyInput(document.getElementById('b_price'));
 
   document.getElementById('todayBtn').addEventListener('click', () => {
     VIEW_MODE = 'day';
@@ -98,7 +99,9 @@ async function loadBookings() {
       <td>${b.staff_name ? escapeHtml(b.staff_name) : '—'}</td>
       <td class="dt-cell"><span class="d">${LianaJalali.isoToJalaliDisplay(b.booking_date)}</span>${b.booking_time ? `<span class="t">${LianaJalali.faDigits(b.booking_time)}</span>` : ''}</td>
       <td></td>
+      <td>${payCell(b)}</td>
       <td style="white-space:nowrap">
+        <button class="btn btn-primary btn-sm fileBtn">${ICON.file}<span>پرونده${b.treatment_count ? ' (' + LianaJalali.faDigits(b.treatment_count) + ')' : ''}</span></button>
         <button class="btn btn-ghost btn-sm editBtn">${ICON.edit}<span>ویرایش</span></button>
         ${CURRENT_USER.role === 'admin' ? `<button class="btn btn-danger btn-sm delBtn">${ICON.trash}<span>حذف</span></button>` : ''}
       </td>
@@ -123,12 +126,24 @@ async function loadBookings() {
     statusCell.appendChild(statusSelect);
 
     tr.querySelector('.editBtn').addEventListener('click', () => openModal(b));
+    tr.querySelector('.fileBtn').addEventListener('click', () => SessionFile.open(b.id, CURRENT_USER, loadBookings));
     tr.querySelector('.delBtn')?.addEventListener('click', () => deleteBooking(b.id, b.customer_name));
     tr.querySelector('.customer-link')?.addEventListener('click', () => {
       window.location.href = `/admin/customers.html?id=${b.customer_id}`;
     });
     tbody.appendChild(tr);
   });
+}
+
+// وضعیتِ مالیِ هر نوبت تو جدول: بدونِ مبلغ «—»، تسویه، یا مانده
+function payCell(b) {
+  const paid = b.paid_total || 0;
+  if (b.price === null || b.price === undefined) {
+    return paid ? `<span class="pill st-done">${Number(paid).toLocaleString('fa-IR')} پرداخت</span>` : '<span style="color:var(--ink-3)">—</span>';
+  }
+  const rem = b.price - paid;
+  if (rem <= 0) return '<span class="pill st-confirmed">تسویه</span>';
+  return `<span class="pill st-pending">مانده ${Number(rem).toLocaleString('fa-IR')}</span>`;
 }
 
 async function deleteBooking(id, name) {
@@ -190,6 +205,7 @@ function openModal(b) {
   document.getElementById('b_time').value = b?.booking_time || '';
   document.getElementById('b_status').value = b?.status || 'confirmed';
   document.getElementById('b_note').value = b?.note || '';
+  document.getElementById('b_price').value = b && b.price !== null && b.price !== undefined ? Number(b.price).toLocaleString('en-US') : '';
 
   document.getElementById('bookingModalBackdrop').style.display = 'flex';
 }
@@ -221,7 +237,9 @@ async function saveBooking() {
     booking_time: document.getElementById('b_time').value || null,
     status: document.getElementById('b_status').value,
     note: document.getElementById('b_note').value.trim() || null,
+    price: (() => { const n = parseAmount(document.getElementById('b_price').value); return Number.isNaN(n) ? undefined : n; })(),
   };
+  if (Number.isNaN(parseAmount(document.getElementById('b_price').value))) { toast('مبلغِ نوبت باید عدد باشه', true); return; }
 
   try {
     if (CURRENT_EDIT_ID) {

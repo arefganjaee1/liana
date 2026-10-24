@@ -141,12 +141,28 @@ export function clearCustomerSessionCookie(res) {
 }
 
 // میدل‌ور: نیاز به لاگین‌بودنِ مشتری تو پورتال
-export function requireCustomerAuth() {
+// سشن فقط وقتی معتبره که مشتری ردیفِ دسترسی (customer_portal_access) داشته باشه — اگه پذیرش
+// دسترسیش رو غیرفعال کرده باشه، سشن‌های قدیمی هم دیگه کار نمی‌کنن.
+// مشتریِ «pending» (با رمزِ پیش‌فرض وارد شده، هنوز رمزِ خودش رو نذاشته) فقط به روت‌هایی که
+// صریحاً allowPending دارن (مثلِ /me و /set-password) دسترسی داره.
+export function requireCustomerAuth({ allowPending = false } = {}) {
   return (req, res, next) => {
     const cookies = parseCookies(req);
-    const customer = getSessionCustomer(cookies[CUSTOMER_SESSION_COOKIE]);
+    const token = cookies[CUSTOMER_SESSION_COOKIE];
+    const customer = getSessionCustomer(token);
     if (!customer) return res.status(401).json({ ok: false, error: 'لاگین لازمه' });
+    const access = db.prepare('SELECT * FROM customer_portal_access WHERE customer_id = ?').get(customer.id);
+    if (!access) {
+      destroyCustomerSession(token);
+      clearCustomerSessionCookie(res);
+      return res.status(401).json({ ok: false, error: 'لاگین لازمه' });
+    }
+    if (access.status !== 'active' && !allowPending) {
+      return res.status(403).json({ ok: false, must_change: true, error: 'اول باید رمزِ خودت رو تعیین کنی.' });
+    }
     req.customer = customer;
+    req.portalAccess = access;
+    req.customerSessionToken = token;
     next();
   };
 }

@@ -272,3 +272,34 @@ textarea { resize: vertical; min-height: 70px; font-family: inherit; }
 .jpicker-footer { display: flex; justify-content: space-between; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--line); }
 .jpicker-footer button { font-size: 11.5px; font-weight: 700; color: var(--accent-strong); background: none; border: none; padding: 4px 6px; }
 .jpicker-footer button:hover { text-decoration: underline; }
+
+/* بخشِ «ورود به پروفایلِ آنلاین» تو مودالِ مشتری */
+.portal-access { border: 1px solid var(--line); border-radius: var(--radius-md, 14px); padding: 14px 16px; margin-bottom: 18px; background: var(--cream); }
+.portal-access .section-title { justify-content: flex-start; gap: 8px; }
+.portal-access-text { font-size: 12.5px; line-height: 1.8; color: var(--ink-2); margin: 0 0 12px; }
+.portal-access-text b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.portal-access-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* انبار */
+.inv-toggle { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--ink-2); cursor: pointer; }
+.inv-toggle input { width: auto; }
+.table-scroll { overflow-x: auto; }
+.adjust-box { border: 1px solid var(--line); background: var(--cream-2); border-radius: var(--radius-md); padding: 12px 14px 4px; margin-top: 12px; }
+.adjust-box[hidden] { display: none; }
+.adjust-actions { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 10px; }
+.backup-note { font-size: 13px; line-height: 1.9; color: var(--ink-2); background: var(--warn-bg); border-color: transparent; }
+.backup-note strong { color: var(--ink); }
+
+/* پرونده‌ی نوبت */
+.file-add { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; margin-top: 10px; padding: 12px; background: var(--cream-2); border-radius: var(--radius-md); }
+.file-add .field { margin-bottom: 0; flex: 1 1 130px; min-width: 0; }
+.file-add .btn { flex: none; margin-bottom: 1px; }
+.fin-summary { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
+.fin-price { flex: 2 1 240px; display: flex; flex-direction: column; gap: 5px; }
+.fin-price label { font-size: 12px; font-weight: 700; color: var(--ink-2); }
+.fin-price-row { display: flex; gap: 6px; }
+.fin-price-row input { flex: 1; min-width: 0; }
+.fin-stat { flex: 1 1 120px; background: var(--cream-2); border-radius: var(--radius-md); padding: 8px 12px; display: flex; flex-direction: column; gap: 2px; }
+.fin-stat span { font-size: 11.5px; color: var(--ink-3); }
+.fin-stat strong { font-size: 15px; font-variant-numeric: tabular-nums; }
+.t-sub { display: block; font-size: 11px; color: var(--ink-3); }
